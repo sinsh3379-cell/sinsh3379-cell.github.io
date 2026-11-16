@@ -34,6 +34,8 @@ select{appearance:none;border:1px solid #cfd6e2;background:#fff;border-radius:10
   font-size:14px;font-weight:600;color:#22314c;max-width:100%;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%236b7787' stroke-width='1.6' fill='none'/></svg>");
   background-repeat:no-repeat;background-position:right 11px center}
+.shell{display:flex;align-items:flex-start;justify-content:center;max-width:1500px;margin:0 auto}
+.shell > .wrap{flex:1 1 auto;min-width:0}
 .wrap{max-width:1120px;margin:0 auto;padding:16px 18px 60px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px 20px;
   box-shadow:0 1px 2px rgba(18,58,99,.05)}
@@ -193,6 +195,26 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
   .opt .txt{font-size:23px}
   .bogi .bi{font-size:25px}
 }
+/* ── 태블릿 가로·데스크톱: 오른쪽 사이드바를 상시 고정 ── */
+@media (min-width:960px){
+  .drawer{position:sticky;top:104px;left:auto;right:auto;bottom:auto;transform:none;
+    flex:0 0 322px;width:322px;height:auto;max-height:calc(100vh - 120px);z-index:5;
+    margin:16px 18px 40px 0;padding:16px;border:1px solid var(--line);border-radius:16px;
+    background:#fff;box-shadow:0 1px 2px rgba(18,58,99,.05);overflow:hidden}
+  .drawer .dclose{display:none}
+  #btnList{display:none}
+  .drawer .today{order:-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 9px;
+    border-top:none;border-bottom:1px solid var(--line);padding:0 2px 12px;margin:0 0 12px}
+  .drawer .today .tl{font-size:15.5px;font-weight:800;color:var(--navy)}
+  .drawer .today .tv{font-size:33px;font-weight:800;color:var(--navy2);line-height:1.1;
+    font-variant-numeric:tabular-nums}
+  .drawer .today .tv small{font-size:15px;font-weight:800;margin-left:3px}
+  .drawer .today .ts{font-size:13px;color:var(--muted);width:100%}
+  .drawer .dhead{margin-bottom:10px}
+  .drawer .dhead .t{font-size:16.5px}
+  .drawer .grid{grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+  .drawer .gi{height:44px;font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -215,6 +237,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
   </div>
 </div>
 
+<div class="shell">
 <main class="wrap">
   <section class="card" id="card"></section>
 </main>
@@ -226,6 +249,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
   <div class="today" id="todaybar"></div>
   <div class="score" id="score"></div>
 </aside>
+</div>
 
 <button class="hlfloat" id="hlfloat">🖍️ 칠하기</button>
 <div class="toast" id="toast"></div>
