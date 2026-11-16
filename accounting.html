@@ -150,10 +150,14 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
 .empty{padding:28px 8px;text-align:center;color:#6b7787;font-size:13.5px;line-height:1.7}
 .empty b{color:#23364f}
 
-/* ── 이번에 푼 문제(세션) 카운터 ── */
-.daily{margin-top:10px;border-top:1px solid #eef1f6;padding-top:10px;font-size:12px;color:#2b3d55;line-height:1.7}
-.daily b{color:var(--navy,#123a63)}
-.daily .sub{color:#5a6678;font-weight:600}
+/* ── 오늘 푼 문제(매일 새벽 6시 리셋) ── */
+.todaybar{width:100%;background:var(--card,#fff);border-radius:14px;
+  box-shadow:0 1px 2px rgba(16,30,54,.06),0 6px 18px rgba(16,30,54,.05);
+  padding:12px 14px 13px;margin:0 0 10px;color:#2b3d55;line-height:1.25}
+.todaybar .tl{font-size:13.5px;font-weight:800;color:#5a6678;letter-spacing:-.2px;margin-bottom:3px}
+.todaybar .tv{font-size:28px;font-weight:900;color:var(--navy,#123a63);letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.todaybar .tv small{font-size:16px;font-weight:800;margin-left:2px;letter-spacing:-.3px}
+.todaybar .ts{font-size:14px;font-weight:800;color:#41556f;margin-top:4px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -184,6 +188,7 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
     <div class="card" id="card"></div>
   </div>
   <aside class="side">
+    <div class="todaybar" id="todaybar"></div>
     <div class="card">
       <div class="sidehead"><span class="t">문제 목록</span><span class="c" id="sideCount"></span></div>
       <div class="grid" id="grid"></div>
@@ -195,7 +200,6 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
       </div>
       <div class="score" id="score"></div>
       <div class="unitlist" id="unitlist"></div>
-      <div class="daily" id="daily"></div>
     </div>
   </aside>
 </div>
@@ -212,13 +216,20 @@ let list=[],cur=0;
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));return s&&s.answers?s:null}catch(e){return null}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 
-/* ── 이번 접속(세션) 푼 문제 카운터 ── 메모리에만 두어 페이지를 새로 열면 0부터 시작한다 */
-let sessIds=new Set(), sessRight=new Set();
-function markSession(id, ok){ if(!id||sessIds.has(id)) return; sessIds.add(id); if(ok) sessRight.add(id); }
+/* ── 오늘 푼 문제 카운터 ── 매일 새벽 6시에 0으로 리셋(하루 키 = 현재시각-6시간의 날짜) */
+const LSK=LS+'_daily6';
+function dayKey(){ const d=new Date(Date.now()-6*3600*1000); const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function freshDay(){ return {day:dayKey(), ids:[], right:[]}; }
+function loadDaily(){ let o=null; try{ o=JSON.parse(localStorage.getItem(LSK)) }catch(e){} if(!o||o.day!==dayKey()||!Array.isArray(o.ids)) o=freshDay(); if(!Array.isArray(o.right)) o.right=[]; return o; }
+let daily=loadDaily();
+function saveDaily(){ try{ localStorage.setItem(LSK, JSON.stringify(daily)) }catch(e){} }
+function markDaily(id, ok){ if(!id) return; if(daily.day!==dayKey()) daily=freshDay(); if(daily.ids.includes(id)) return; daily.ids.push(id); if(ok) daily.right.push(id); saveDaily(); }
 function renderDaily(){
-  const el=document.getElementById('daily'); if(!el) return;
-  const n=sessIds.size, r=sessRight.size;
-  el.innerHTML=`✏️ 이번에 푼 문제: <b>${n}</b>문제`+(n?` <span class="sub">(맞음 <b>${r}</b> · 정답률 <b>${Math.round(r/n*100)}%</b>)</span>`:'');
+  const el=document.getElementById('todaybar'); if(!el) return;
+  if(daily.day!==dayKey()) daily=freshDay();
+  const n=daily.ids.length, r=daily.right.length;
+  el.innerHTML=`<div class="tl">✏️ 오늘 푼 문제</div><div class="tv">${n}<small>문제</small></div>`
+    +(n?`<div class="ts">맞음 ${r} · 정답률 ${Math.round(r/n*100)}%</div>`:'');
 }
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1700);}
 function unitsOf(major){
@@ -350,7 +361,7 @@ function gradeCurrent(){
   if(!state.answers[q.id]){toast('보기를 선택해 주세요');return;}
   const picked=(q.choices||[]).find(c=>c.n===state.answers[q.id]);
   state.graded[q.id]=!!(picked&&picked.ans);
-  markSession(q.id, state.graded[q.id]===true);
+  markDaily(q.id, state.graded[q.id]===true);
   save();render();renderGrid();renderScore();renderUnits();
 }
 function go(d){const n=cur+d;
