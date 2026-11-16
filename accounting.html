@@ -231,9 +231,9 @@ function buildSelectors(){
   }).join('');
   if(!KINDS.some(k=>k.v===state.kind)) state.kind='전체';
   sk.value=state.kind;
-  sm.onchange=()=>{state.major=sm.value;state.unit=null;state.idx=0;buildSelectors();rebuild();};
-  su.onchange=()=>{state.unit=su.value;state.idx=0;buildSelectors();rebuild();};
-  sk.onchange=()=>{state.kind=sk.value;state.idx=0;rebuild();};
+  sm.onchange=()=>{state.major=sm.value;state.unit=null;state.idx=0;save();buildSelectors();rebuild();};
+  su.onchange=()=>{state.unit=su.value;state.idx=0;save();buildSelectors();rebuild();};
+  sk.onchange=()=>{state.kind=sk.value;state.idx=0;save();rebuild();};
 }
 function rebuild(){
   const scope=scopeList();
