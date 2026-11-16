@@ -285,7 +285,7 @@ function render(){
     </div>`;
   }
   document.getElementById('card').innerHTML=`<div class="badges">${badges}</div>
-    <div class="qhead"><span class="qno">${cur+1}.</span><span>${esc(q.stem)}</span></div>
+    <div class="qhead"><span class="qno">${cur+1}.</span><span>${esc(q.stem).replace(/○/g,'<br>○')}</span></div>
     ${bodyHtml(q,picked,graded)}
     <div class="actions"><button class="btn" id="btnPrev">이전</button><button class="btn" id="btnNext">다음</button>
       <div class="right">${graded!==undefined&&graded!==null?`<button class="btn primary" id="btnHide">정답 숨기기</button>`:`<button class="btn primary" id="btnSubmit">정답 확인</button>`}</div></div>
