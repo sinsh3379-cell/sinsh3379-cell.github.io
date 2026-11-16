@@ -863,7 +863,7 @@ function renderGrid(){
     return `<div class="${cls}" data-i="${i}">${i + 1}${st}${mc}</div>`;
   }).join('');
   g.querySelectorAll('.gi').forEach(el => {
-    el.onclick = () => { cur = +el.dataset.i; state.idx = cur; save(); render(); closeDrawer(); };
+    el.onclick = () => { cur = +el.dataset.i; state.idx = cur; save(); render(); renderGrid(); closeDrawer(); };
   });
 }
 function renderScore(){
