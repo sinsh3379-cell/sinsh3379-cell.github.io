@@ -333,7 +333,7 @@ function explHtml(q){
   return `<div class="exp">
     <h3>해설</h3>${(q.e||[]).map(p=>`<p>${esc(p)}</p>`).join('')}
     ${pdf}${oxHtml(q)}${fq}${law}${key}
-    <div class="hint">단축키: 1~5 보기 선택 · ←/→ 이동 · Enter 정답 확인 / 다음 · 주관식은 답 입력 후 Enter<br>출처: 한국산업인력공단 큐넷 공개 기출문제(제19~28회) · 해설·선지별 O/X·핵심은 클이 직접 작성</div>
+    <div class="hint"><div>단축키: 1~5 보기 선택 · ←/→ 이동 · Enter 정답 확인 / 다음 · 주관식은 답 입력 후 Enter</div><div style="margin-top:5px">출처: 한국산업인력공단 큐넷 공개 기출문제(제19~28회) · 해설·선지별 O/X·핵심은 클이 직접 작성</div></div>
   </div>`;
 }
 function parseBlanks(t){
