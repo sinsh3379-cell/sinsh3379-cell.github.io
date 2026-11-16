@@ -145,6 +145,11 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
 .qimg{max-width:100%;border:1px solid #e6ebf3;border-radius:8px;margin:6px 0 12px;background:#fff}
 .intro{font-size:13.5px;line-height:1.7;color:#23364f;margin:0 0 8px;font-weight:600}
 @media(min-width:901px){.grid{max-height:340px;overflow:auto}}
+
+/* ── 이번에 푼 문제(세션) 카운터 ── */
+.daily{margin-top:10px;border-top:1px solid #eef1f6;padding-top:10px;font-size:12px;color:#2b3d55;line-height:1.7}
+.daily b{color:var(--navy,#123a63)}
+.daily .sub{color:#5a6678;font-weight:600}
 </style>
 <style>
 .subrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
@@ -192,6 +197,7 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
       </div>
       <div class="score" id="score"></div>
       <div class="unitlist" id="unitlist"></div>
+      <div class="daily" id="daily"></div>
     </div>
   </aside>
 </div>
@@ -206,6 +212,15 @@ let state=load()||{answers:{},graded:{},major:'건축구조',unit:null,idx:0};
 let list=[],cur=0;
 function load(){try{const s=JSON.parse(localStorage.getItem(LS));return s&&s.answers?s:null}catch(e){return null}}
 function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+
+/* ── 이번 접속(세션) 푼 문제 카운터 ── 메모리에만 두어 페이지를 새로 열면 0부터 시작한다 */
+let sessIds=new Set(), sessRight=new Set();
+function markSession(id, ok){ if(!id||sessIds.has(id)) return; sessIds.add(id); if(ok) sessRight.add(id); }
+function renderDaily(){
+  const el=document.getElementById('daily'); if(!el) return;
+  const n=sessIds.size, r=sessRight.size;
+  el.innerHTML=`✏️ 이번에 푼 문제: <b>${n}</b>문제`+(n?` <span class="sub">(맞음 <b>${r}</b> · 정답률 <b>${Math.round(r/n*100)}%</b>)</span>`:'');
+}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1700);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function roundsText(rs){return (rs||[]).map(r=>'제'+r+'회').join('·')}
@@ -253,6 +268,7 @@ function rebuild(){
   render();renderGrid();renderScore();renderUnits();
 }
 function renderScore(){
+  renderDaily();
   const done=Object.values(state.graded||{}).filter(v=>v===true||v===false).length;
   const right=Object.values(state.graded||{}).filter(v=>v===true).length;
   document.getElementById('score').innerHTML=`확인한 문항 <b>${done}</b> · 맞음 <b>${right}</b>`+(done?` · 정답률 <b>${Math.round(right/done*100)}%</b>`:'');
@@ -330,6 +346,7 @@ function gradeCurrent(){
   if(!q.a){ state.graded[q.id]=null; save(); render(); renderGrid(); renderScore(); renderUnits();
     toast('이 문항은 현행 기준 정답이 없습니다 (해설의 [검수 보완] 참고)'); return; }
   state.graded[q.id]=(state.answers[q.id]===q.a);
+  markSession(q.id, state.graded[q.id]===true);
   save();render();renderGrid();renderScore();renderUnits();
 }
 function go(d){const n=cur+d;

@@ -137,6 +137,11 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
   .card{padding:13px 13px}
   .qhead{font-size:14px}
 }
+
+/* ── 이번에 푼 문제(세션) 카운터 ── */
+.daily{margin-top:10px;border-top:1px solid #eef1f6;padding-top:10px;font-size:12px;color:#2b3d55;line-height:1.7}
+.daily b{color:var(--navy,#123a63)}
+.daily .sub{color:#5a6678;font-weight:600}
 </style>
 </head>
 <body>
@@ -176,6 +181,7 @@ select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='
       </div>
       <div class="score" id="score"></div>
       <div class="unitlist" id="unitlist"></div>
+      <div class="daily" id="daily"></div>
     </div>
   </aside>
 </div>
@@ -195,6 +201,15 @@ let cur = 0;
 
 function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)); return s&&s.answers?s:null }catch(e){ return null } }
 function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)) }catch(e){} }
+
+/* ── 이번 접속(세션) 푼 문제 카운터 ── 메모리에만 두어 페이지를 새로 열면 0부터 시작한다 */
+let sessIds=new Set(), sessRight=new Set();
+function markSession(id, ok){ if(!id||sessIds.has(id)) return; sessIds.add(id); if(ok) sessRight.add(id); }
+function renderDaily(){
+  const el=document.getElementById('daily'); if(!el) return;
+  const n=sessIds.size, r=sessRight.size;
+  el.innerHTML=`✏️ 이번에 푼 문제: <b>${n}</b>문제`+(n?` <span class="sub">(맞음 <b>${r}</b> · 정답률 <b>${Math.round(r/n*100)}%</b>)</span>`:'');
+}
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1600); }
 
 function unitsOf(law){
@@ -226,6 +241,7 @@ function isCorrect(q){
   return a===true;
 }
 function renderScore(){
+  renderDaily();
   const ids=new Set(DATA.map(q=>q.id));
   const ent=Object.entries(state.graded||{}).filter(([k])=>ids.has(k));
   const done=ent.length;
@@ -346,7 +362,7 @@ function checkShort(){
     if(parts.length>1) return parts.every(p=>nv.includes(norm(p)));
     return nv===norm(parts[0]||target) || nv.includes(norm(parts[0]||target));
   })();
-  state.graded[q.id]=ok; save(); render(); renderGrid(); renderScore(); renderUnits();
+  state.graded[q.id]=ok; markSession(q.id, ok); save(); render(); renderGrid(); renderScore(); renderUnits();
 }
 function gradeCurrent(){
   const q=list[cur];
@@ -355,6 +371,7 @@ function gradeCurrent(){
     const picked=(q.choices||[]).find(c=>c.n===state.answers[q.id]);
     state.graded[q.id]= !!(picked&&picked.ans);
   } else checkShort();
+  markSession(q.id, state.graded[q.id]===true);
   save(); render(); renderGrid(); renderScore(); renderUnits();
 }
 function go(d){
