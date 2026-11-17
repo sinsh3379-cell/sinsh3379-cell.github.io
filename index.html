@@ -619,8 +619,8 @@ function buildSelectors(){
   const us = unitsOfPart();
   const su = document.getElementById('selUnit');
   const tot = us.reduce((a, u) => a + u.n, 0);
-  su.innerHTML = `<option value="전체 단원">전체 단원 (10년간 ${tot}문제)</option>` +
-    us.map(u => `<option value="${esc(u.name)}">${esc(u.name)} (10년간 ${u.n}문제)</option>`).join('');
+  su.innerHTML = `<option value="전체 단원">전체 단원 (11년간 ${tot}문제)</option>` +
+    us.map(u => `<option value="${esc(u.name)}">${esc(u.name)} (11년간 ${u.n}문제)</option>`).join('');
   if (!us.some(u => u.name === state.unit)) state.unit = '전체 단원';
   su.value = state.unit;
 

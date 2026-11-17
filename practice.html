@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3">
-<title>주택관리사 2차 공동주택관리실무 CBT — 19~28회 10개년 397제</title>
+<title>주택관리사 2차 공동주택관리실무 CBT — 19~29회 11개년 437제</title>
 <style>
 :root{
   --bg:#eef1f6; --card:#fff; --navy:#123a63; --navy2:#1d4f80;
@@ -267,7 +267,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 <body>
 <header class="topbar">
   <div class="topin">
-    <div class="brand">주택관리사 2차 공동주택관리실무 CBT<small>19~28회 10개년</small></div>
+    <div class="brand">주택관리사 2차 공동주택관리실무 CBT<small>19~29회 11개년</small></div>
     <div class="progwrap">
       <div class="progtxt" id="progtxt">1 / 1</div>
       <div class="progbar"><div class="progfill" id="progfill"></div></div>
@@ -620,8 +620,8 @@ function buildSelectors(){
   const us = unitsOfPart();
   const su = document.getElementById('selUnit');
   const tot = us.reduce((a, u) => a + u.n, 0);
-  su.innerHTML = `<option value="전체 단원">전체 단원 (10년간 ${tot}문제)</option>` +
-    us.map(u => `<option value="${esc(u.name)}">${esc(u.name)} (10년간 ${u.n}문제)</option>`).join('');
+  su.innerHTML = `<option value="전체 단원">전체 단원 (11년간 ${tot}문제)</option>` +
+    us.map(u => `<option value="${esc(u.name)}">${esc(u.name)} (11년간 ${u.n}문제)</option>`).join('');
   if (!us.some(u => u.name === state.unit)) state.unit = '전체 단원';
   su.value = state.unit;
 
