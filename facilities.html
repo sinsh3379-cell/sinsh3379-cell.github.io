@@ -252,6 +252,16 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
   .keybox { font-size: 13px !important; padding: 8px 10px !important; margin-top: 8px !important; }
 }
 
+
+/* ☁️ 기기 간 동기화 상태 표시 (아주 작게) */
+.syn{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;
+  color:#4a5a72;background:#eef2f8;border:1px solid #dbe2ee;border-radius:99px;padding:3px 9px;
+  white-space:nowrap;cursor:pointer;user-select:none;line-height:1.45;font-family:inherit}
+.syn.ok{color:#1f6b41;background:#eaf7ef;border-color:#bfe3cc}
+.syn.wait{color:#8a6100;background:#fff7e0;border-color:#ecd9a3}
+.syn.err{color:#a8382f;background:#fdeeec;border-color:#f3c9c4}
+@media (max-width:768px){.syn{font-size:10px;padding:2px 6px;gap:2px}}
+@media (max-width:430px){.syn .synt{display:none}.syn{padding:2px 5px}}
 </style>
 </head>
 <body>
@@ -262,6 +272,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
       <div class="progtxt" id="progtxt">1 / 1</div>
       <div class="progbar"><div class="progfill" id="progfill"></div></div>
     </div>
+    <button type="button" class="syn" id="synchip" title="기기 간 기록 동기화"><span class="syni">☁️</span><span class="synt">확인 중</span></button>
     <button class="tbtn" id="btnList">☰ 목록</button>
   </div>
 </header>
@@ -963,6 +974,482 @@ document.body.classList.toggle('hlmode', hlOn);
 
 buildSelectors();
 rebuild();
+
+/* ── ☁️ 기기 간 자동 동기화 (회사 태블릿 · 집 태블릿 · 스마트폰) ─────────────
+   무로그인 공용 JSON 저장소(MantleDB)에 이 과목의 풀이 기록을 올리고,
+   페이지를 열 때마다 내려받아 병합합니다. 기기별 위치·필터는 동기화하지 않습니다. */
+(function(){
+  if (window.__cbtSync) return;
+  window.__cbtSync = true;
+
+  var NS  = 'sin-cbt-8f63a95fe0dabf99ceeaf55a';
+  var SID = String(LS).replace(/^jutaek_/, '').replace(/_cbt_v1$/, '');
+  var URL_ = 'https://mantledb.sh/v2/' + NS + '/s/' + SID;
+  var META_KEY = LS + '_syncv1';
+  var DEBOUNCE = 1200;        // 변경 후 1.2초 뒤 업로드
+  var PULL_EVERY = 90000;     // 화면을 보고 있는 동안 90초마다 새 기록 확인
+  var HEARTBEAT = 2 * 86400000; // 2일 이상 기록이 없으면 한 번 더 올려 저장소를 살려 둠
+
+  var origWriteJSON = writeJSON;
+  var origSaveDaily = saveDaily;
+  var suppress = false, dirty = false, busy = false, again = false, timer = 0;
+
+  var meta = (function(){
+    try { var m = JSON.parse(localStorage.getItem(META_KEY)); return (m && typeof m === 'object') ? m : {}; } catch(e){ return {}; }
+  })();
+  meta.w = meta.w || {}; meta.wm = meta.wm || {}; meta.wh = meta.wh || {};
+  if (!meta.pull) meta.pull = 0;
+  if (!meta.push) meta.push = 0;
+  function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch(e){} }
+
+  var snapAns = jclone(state.answers || {}), snapGraded = jclone(state.graded || {});
+  var snapMis = jclone(mistakes), snapMarks = jclone(marks), snapHL = jclone(HLS);
+
+  var chip = document.getElementById('synchip');
+  function setChip(kind, label, title){
+    if (!chip) return;
+    chip.className = 'syn' + (kind ? ' ' + kind : '');
+    var t = chip.querySelector('.synt');
+    if (t) t.textContent = label;
+    chip.title = title || label;
+  }
+
+  function jclone(o){ try { return JSON.parse(JSON.stringify(o == null ? null : o)); } catch(e){ return null; } }
+  function jEq(a, b){ return JSON.stringify(a) === JSON.stringify(b); }
+  function keys(o){ return Object.keys(o || {}); }
+  function isEmptyDoc(d){
+    var dayN = 0;
+    keys(d.day).forEach(function(k){ dayN += keys(d.day[k]).length; });
+    return !keys(d.ans).length && !keys(d.mis).length && !keys(d.mk).length &&
+           !keys(d.hl).length && !dayN;
+  }
+
+  /* ── 로컬 상태 → 클라우드 문서 ─────────────────────────────────────── */
+  function buildDoc(){
+    var doc = {v:1, u:Date.now(), ans:{}, mis:{}, mk:{}, hl:{}, day:{}};
+    var a = state.answers || {}, g = state.graded || {};
+
+    var ids = {};
+    keys(meta.w).forEach(function(k){ ids[k] = 1; });
+    keys(a).forEach(function(k){ ids[k] = 1; });
+    keys(g).forEach(function(k){ ids[k] = 1; });
+    keys(ids).forEach(function(k){
+      var hasA = Object.prototype.hasOwnProperty.call(a, k);
+      var hasG = Object.prototype.hasOwnProperty.call(g, k);
+      var gv = -2;                                  // -2 = 채점 정보 없음
+      if (hasG) gv = (g[k] === true) ? 1 : ((g[k] === false) ? 0 : -1);  // -1 = 채점 불가(null)
+      if (!hasA && !hasG) {                         // '다시 풀기'로 지운 문항은 흔적(-3)으로 남겨 다른 기기에도 알림
+        if (meta.w[k]) doc.ans[k] = [ null, -3, meta.w[k] ];
+        return;
+      }
+      doc.ans[k] = [ hasA ? a[k] : null, gv, meta.w[k] || 0 ];
+    });
+
+    keys(mistakes).forEach(function(k){ var n = mistakes[k] | 0; if (n > 0) doc.mis[k] = n; });
+
+    keys(meta.wm).forEach(function(k){ if (!marks[k]) doc.mk[k] = [0, meta.wm[k] || 0]; });
+    keys(marks).forEach(function(k){ if (marks[k]) doc.mk[k] = [1, meta.wm[k] || 0]; });
+
+    keys(meta.wh).forEach(function(q){ keys(meta.wh[q]).forEach(function(key){
+      if (!HLS[q] || !HLS[q][key]) doc.hl[q] = doc.hl[q] || {}, doc.hl[q][key] = {r: [], t: meta.wh[q][key] || 0};
+    }); });
+    keys(HLS).forEach(function(q){ keys(HLS[q] || {}).forEach(function(key){
+      var r = HLS[q][key];
+      if (!Array.isArray(r)) return;
+      doc.hl[q] = doc.hl[q] || {};
+      doc.hl[q][key] = {r: r, t: (meta.wh[q] && meta.wh[q][key]) || 0};
+    }); });
+
+    var dk = dayKey();
+    if (daily && daily.day === dk && daily.ids && keys(daily.ids).length) {
+      var bucket = {};
+      keys(daily.ids).forEach(function(k){ bucket[k] = daily.ids[k] ? 1 : 0; });
+      doc.day[dk] = bucket;
+    }
+    return doc;
+  }
+
+  /* ── 병합 (유실 방지: 문항별 최신 시각, 오답 횟수는 최댓값, 오늘 카운터는 합집합) ── */
+  function winAns(l, c){
+    if (l[2] > c[2]) return l;
+    if (c[2] > l[2]) return c;
+    var lHas = (l[1] === 1 || l[1] === 0 || l[1] === -1), cHas = (c[1] === 1 || c[1] === 0 || c[1] === -1);
+    if (lHas !== cHas) return lHas ? l : c;
+    if (lHas && cHas && l[1] !== c[1]) {               // 둘 다 채점된 옛 기록 → 맞은 쪽 우선
+      if (l[1] === 1) return l;
+      if (c[1] === 1) return c;
+    }
+    var ls = JSON.stringify(l[0]), cs = JSON.stringify(c[0]);
+    return (ls >= cs) ? l : c;                          // 결정적 tie-break(두 기기 결과 동일)
+  }
+  function mergeDocs(L, C){
+    var out = {v:1, u:Math.max(L.u || 0, C.u || 0), ans:{}, mis:{}, mk:{}, hl:{}, day:{}};
+    var set = {};
+    keys(L.ans).forEach(function(k){ set[k] = 1; }); keys(C.ans).forEach(function(k){ set[k] = 1; });
+    keys(set).forEach(function(k){
+      var l = L.ans[k], c = C.ans[k];
+      if (!l) out.ans[k] = c.slice();
+      else if (!c) out.ans[k] = l.slice();
+      else { var w = winAns(l, c); out.ans[k] = w.slice(); }
+    });
+    var s2 = {};
+    keys(L.mis).forEach(function(k){ s2[k] = 1; }); keys(C.mis).forEach(function(k){ s2[k] = 1; });
+    keys(s2).forEach(function(k){ out.mis[k] = Math.max(L.mis[k] || 0, C.mis[k] || 0); });
+    var s3 = {};
+    keys(L.mk).forEach(function(k){ s3[k] = 1; }); keys(C.mk).forEach(function(k){ s3[k] = 1; });
+    keys(s3).forEach(function(k){
+      var l = L.mk[k], c = C.mk[k];
+      if (!l) out.mk[k] = c.slice();
+      else if (!c) out.mk[k] = l.slice();
+      else if (l[1] > c[1]) out.mk[k] = l.slice();
+      else if (c[1] > l[1]) out.mk[k] = c.slice();
+      else out.mk[k] = [ Math.max(l[0] || 0, c[0] || 0), l[1] ];
+    });
+    var s4 = {};
+    keys(L.hl).forEach(function(q){ s4[q] = 1; }); keys(C.hl).forEach(function(q){ s4[q] = 1; });
+    keys(s4).forEach(function(q){
+      var l = L.hl[q] || {}, c = C.hl[q] || {}, o = {};
+      var ks = {};
+      keys(l).forEach(function(k){ ks[k] = 1; }); keys(c).forEach(function(k){ ks[k] = 1; });
+      keys(ks).forEach(function(k){
+        var a = l[k], b = c[k];
+        if (!a) o[k] = b;
+        else if (!b) o[k] = a;
+        else if ((a.t || 0) > (b.t || 0)) o[k] = a;
+        else if ((b.t || 0) > (a.t || 0)) o[k] = b;
+        else o[k] = {r: mergeHL((a.r || []).concat(b.r || [])), t: a.t || 0};
+      });
+      if (keys(o).length) out.hl[q] = o;
+    });
+    var s5 = {};
+    keys(L.day).forEach(function(d){ s5[d] = 1; }); keys(C.day).forEach(function(d){ s5[d] = 1; });
+    keys(s5).forEach(function(d){
+      var l = L.day[d] || {}, c = C.day[d] || {}, o = {};
+      keys(l).forEach(function(k){ o[k] = l[k] ? 1 : 0; });
+      keys(c).forEach(function(k){ o[k] = Math.max(l[k] || 0, c[k] || 0) ? 1 : 0; });
+      out.day[d] = o;
+    });
+    var dks = keys(out.day).sort();
+    while (dks.length > 2) delete out.day[dks.shift()];     // 날짜 버킷은 최근 2일만 유지
+    return out;
+  }
+
+  /* ── 병합 결과를 화면·저장소에 반영 ───────────────────────────────── */
+  function applyDoc(doc){
+    suppress = true;
+    var redraw = false;
+    try {
+      var a = {}, g = {};
+      keys(doc.ans).forEach(function(k){
+        var e = doc.ans[k]; if (!e) return;
+        meta.w[k] = e[2] || 0;
+        if (e[1] === -3) return;                    // 지운 문항(tombstone) — 답·채점 모두 없음
+        if (e[0] !== null && e[0] !== undefined) a[k] = e[0];
+        if (e[1] === 1) g[k] = true;
+        else if (e[1] === 0) g[k] = false;
+        else if (e[1] === -1) g[k] = null;
+      });
+      if (!jEq(a, state.answers) || !jEq(g, state.graded)) redraw = true;
+      state.answers = a; state.graded = g;
+
+      var mi = {};
+      keys(doc.mis).forEach(function(k){ var n = doc.mis[k] | 0; if (n > 0) mi[k] = n; });
+      if (!jEq(mi, mistakes)) redraw = true;
+      mistakes = mi;
+
+      var mk = {};
+      keys(doc.mk).forEach(function(k){ var e = doc.mk[k]; if (Array.isArray(e) && e[0]) mk[k] = 1; meta.wm[k] = e[1] || 0; });
+      if (!jEq(mk, marks)) redraw = true;
+      marks = mk;
+
+      var hl = {};
+      meta.wh = meta.wh || {};
+      keys(doc.hl).forEach(function(q){
+        var o = {}, src = doc.hl[q] || {};
+        meta.wh[q] = meta.wh[q] || {};
+        keys(src).forEach(function(k){
+          var e = src[k] || {};
+          var r = mergeHL(e.r || []);
+          meta.wh[q][k] = e.t || 0;
+          if (r.length) o[k] = r;
+        });
+        if (keys(o).length) hl[q] = o;
+      });
+      if (!jEq(hl, HLS)) redraw = true;
+      HLS = hl;
+
+      var dk = dayKey();
+      if (doc.day && doc.day[dk] && daily.day === dk) {
+        var src2 = doc.day[dk];
+        keys(src2).forEach(function(k){
+          var v = Math.max(daily.ids[k] || 0, src2[k] ? 1 : 0);
+          if (daily.ids[k] !== v) redraw = true;
+          daily.ids[k] = v;
+        });
+      }
+
+      origWriteJSON(LS, state);
+      origWriteJSON(LSM, mistakes);
+      origWriteJSON(LSK, marks);
+      origWriteJSON(LSH, HLS);
+      origSaveDaily();
+      saveMeta();
+    } catch(e) {
+      try { console.warn('[sync] apply 실패', e); } catch(e2){}
+    } finally {
+      suppress = false;
+      snapAns = jclone(state.answers || {}); snapGraded = jclone(state.graded || {});
+      snapMis = jclone(mistakes); snapMarks = jclone(marks); snapHL = jclone(HLS);
+      dirty = false;
+    }
+    if (redraw) redrawView();
+  }
+
+  function redrawView(){
+    try {
+      var ae = document.activeElement;
+      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;  // 입력 중이면 건드리지 않음
+      buildSelectors(); rebuild();
+      if (window.updateProgress) updateProgress();
+    } catch(e) { try { console.warn('[sync] 화면 갱신 실패', e); } catch(e2){} }
+  }
+
+  /* ── 업로드·내려받기 ─────────────────────────────────────────────── */
+  function b64(buf){
+    var bytes = new Uint8Array(buf), out = '', CH = 0x8000;
+    for (var i = 0; i < bytes.length; i += CH) out += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    return btoa(out);
+  }
+  function unb64(str){
+    var s = atob(str), arr = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) arr[i] = s.charCodeAt(i);
+    return arr;
+  }
+  /* 기록이 커도 64KB 제한에 걸리지 않도록 gzip으로 접어서 보관한다 */
+  function pack(doc){
+    var text = JSON.stringify(doc);
+    if (text.length < 8000 || typeof CompressionStream === 'undefined') {
+      return Promise.resolve(JSON.stringify({v:1, raw: doc}));      // 작으면 그대로(사람이 읽을 수 있게)
+    }
+    try {
+      var stream = new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));
+      return new Response(stream).arrayBuffer().then(function(buf){
+        return JSON.stringify({v:1, z:1, d:b64(buf)});
+      }).catch(function(){ return JSON.stringify({v:1, raw: doc}); });
+    } catch(e) { return Promise.resolve(JSON.stringify({v:1, raw: doc})); }
+  }
+  function normDoc(d){
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+    if (!d.ans && !d.hl && !d.mk && !d.mis && !d.day) return null;
+    d.ans = (d.ans && typeof d.ans === 'object') ? d.ans : {};
+    d.hl  = (d.hl  && typeof d.hl  === 'object') ? d.hl  : {};
+    d.mk  = (d.mk  && typeof d.mk  === 'object') ? d.mk  : {};
+    d.mis = (d.mis && typeof d.mis === 'object') ? d.mis : {};
+    d.day = (d.day && typeof d.day === 'object') ? d.day : {};
+    return d;
+  }
+  function unpack(obj){
+    if (!obj) return Promise.resolve(null);
+    if (obj.z && obj.d) {
+      if (typeof DecompressionStream === 'undefined') return Promise.reject(new Error('no DecompressionStream'));
+      try {
+        var stream = new Blob([unb64(obj.d)]).stream().pipeThrough(new DecompressionStream('gzip'));
+        return new Response(stream).text().then(function(t){ return normDoc(JSON.parse(t)); });
+      } catch(e) { return Promise.reject(e); }
+    }
+    var raw = obj.raw;
+    if (typeof raw === 'string') {                     // 예전 형식(문자열로 한 번 더 감싼 경우)
+      try { raw = JSON.parse(raw); } catch(e) { raw = null; }
+    }
+    if (raw === undefined || raw === null) raw = obj;
+    var d = normDoc(raw);
+    return (d || !obj.ans) ? Promise.resolve(d) : Promise.resolve(normDoc(obj));
+  }
+
+  function trim(doc){
+    var body = JSON.stringify(doc);
+    if (body.length <= 60000) return body;
+    var pairs = [];
+    keys(doc.hl).forEach(function(q){ keys(doc.hl[q]).forEach(function(k){ pairs.push([q, k, doc.hl[q][k].t || 0]); }); });
+    pairs.sort(function(a, b){ return a[2] - b[2]; });          // 오래된 형광펜부터 버림
+    for (var i = 0; i < pairs.length && body.length > 60000; i++) {
+      delete doc.hl[pairs[i][0]][pairs[i][1]];
+      if (!keys(doc.hl[pairs[i][0]]).length) delete doc.hl[pairs[i][0]];
+      body = JSON.stringify(doc);
+    }
+    return body;
+  }
+
+  function getCloud(tries){
+    return fetch(URL_, {cache:'no-store'}).then(function(r){
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error('GET ' + r.status);
+      return r.json();
+    }).then(function(raw){
+      return unpack(raw).then(function(doc){
+        if (raw && !doc) throw new Error('unreadable cloud doc');   // 해석 실패 시 덮어쓰지 않음
+        return doc;
+      });
+    }).catch(function(err){
+      if (tries > 1) {
+        setChip('err', '오프라인', '연결을 다시 시도하는 중입니다.');
+        return new Promise(function(res){ setTimeout(res, 1500); }).then(function(){ return getCloud(tries - 1); });
+      }
+      throw err;
+    });
+  }
+
+  function performSync(reason){
+    if (busy) { again = true; return; }
+    busy = true;
+    setChip('', '확인 중', '기록을 확인하는 중입니다.');
+    getCloud(2)
+      .then(function(cloud){
+        meta.pull = Date.now();
+        var local = buildDoc();
+        var cloudHas = !!(cloud && !isEmptyDoc(cloud));
+        var merged = cloudHas ? mergeDocs(local, cloud) : local;
+        applyDoc(merged);
+        saveMeta();
+        if (isEmptyDoc(merged)) { setChip('ok', '동기화됨', '아직 올릴 기록이 없습니다.'); return null; }
+        if (!cloudHas) return pushDoc(merged);                       // 첫 올리기(빈 저장소 채우기)
+        var localNew = !jEq(merged.ans, cloud.ans) || !jEq(merged.mis, cloud.mis) ||
+                       !jEq(merged.mk, cloud.mk) || !jEq(merged.hl, cloud.hl) || !jEq(merged.day, cloud.day);
+        var beat = (Date.now() - (meta.push || 0)) > HEARTBEAT;      // 저장소 유지용 되살리기
+        if (localNew || beat || reason === 'user') return pushDoc(merged);
+        setChip('ok', '동기화됨', '마지막 확인 ' + timeLabel());
+        return null;
+      })
+      .catch(function(err){
+        try { console.warn('[sync] ' + (err && err.message || err)); } catch(e){}
+        setChip('err', '오프라인', '연결되면 다시 올립니다. 기록은 이 기기에 안전하게 저장되어 있습니다.');
+        dirty = true;
+      })
+      .then(function(){ busy = false; if (again) { again = false; setTimeout(function(){ performSync('queued'); }, 400); } });
+  }
+
+  function postDoc(body, tries, keepalive){
+    var opt = {method:'POST', headers:{'Content-Type':'application/json'}, body: body};
+    if (keepalive) opt.keepalive = true;
+    return fetch(URL_, opt).then(function(r){
+      if (!r.ok) throw new Error('POST ' + r.status);
+    }).catch(function(err){
+      if (tries > 1) return new Promise(function(res){ setTimeout(res, 1500); }).then(function(){ return postDoc(body, tries - 1, keepalive); });
+      throw err;
+    });
+  }
+
+  function pushDoc(doc){
+    setChip('wait', '저장중', '기록을 올리는 중입니다.');
+    return pack(doc).then(function(body){
+      return postDoc(body, 2, false);
+    }).then(function(){
+      meta.push = Date.now(); dirty = false; saveMeta();
+      setChip('ok', '동기화됨', '마지막 저장 ' + timeLabel());
+    });
+  }
+
+  function flush(){
+    if (!dirty || suppress) return;
+    if (Date.now() - (meta.pull || 0) > 120000) return;   // 오래 안 본 상태로 덮어쓰지 않음
+    try {
+      var doc = buildDoc();
+      if (isEmptyDoc(doc)) return;
+      pack(doc).then(function(body){ return postDoc(body, 1, true); }).catch(function(){});
+      meta.push = Date.now(); dirty = false; saveMeta();
+    } catch(e){}
+  }
+
+  function timeLabel(){
+    var d = new Date();
+    var p = function(n){ return String(n).padStart(2, '0'); };
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function scheduleSync(){
+    if (suppress) return;
+    setChip('wait', '저장중', '곧 올립니다.');
+    clearTimeout(timer);
+    timer = setTimeout(function(){ performSync('debounce'); }, DEBOUNCE);
+  }
+
+  /* ── 로컬 저장을 감시해 바뀐 문항에 시각을 찍는다 ─────────────────── */
+  writeJSON = function(k, v){
+    origWriteJSON(k, v);
+    if (suppress) return;
+    var now = Date.now(), touched = false;
+    try {
+      if (k === LS) {
+        var a = (v && v.answers) || {}, g = (v && v.graded) || {};
+        var ids = {};
+        keys(a).forEach(function(x){ ids[x] = 1; }); keys(g).forEach(function(x){ ids[x] = 1; });
+        keys(snapAns).forEach(function(x){ ids[x] = 1; }); keys(snapGraded).forEach(function(x){ ids[x] = 1; });
+        keys(ids).forEach(function(x){
+          var inA = Object.prototype.hasOwnProperty.call(a, x), inG = Object.prototype.hasOwnProperty.call(g, x);
+          var hadA = Object.prototype.hasOwnProperty.call(snapAns, x), hadG = Object.prototype.hasOwnProperty.call(snapGraded, x);
+          if (inA !== hadA || inG !== hadG || !jEq(a[x], snapAns[x]) || !jEq(g[x], snapGraded[x])) {
+            meta.w[x] = now; touched = true;
+          }
+        });
+        snapAns = jclone(a) || {}; snapGraded = jclone(g) || {};
+      } else if (k === LSK) {
+        var ids2 = {};
+        keys(v).forEach(function(x){ ids2[x] = 1; }); keys(snapMarks).forEach(function(x){ ids2[x] = 1; });
+        keys(ids2).forEach(function(x){
+          if (!!v[x] !== !!snapMarks[x]) { meta.wm[x] = now; touched = true; }
+        });
+        snapMarks = jclone(v) || {};
+      } else if (k === LSH) {
+        var qs = {};
+        keys(v).forEach(function(x){ qs[x] = 1; }); keys(snapHL).forEach(function(x){ qs[x] = 1; });
+        keys(qs).forEach(function(q){
+          var cur = v[q] || {}, old = snapHL[q] || {};
+          var ks = {};
+          keys(cur).forEach(function(x){ ks[x] = 1; }); keys(old).forEach(function(x){ ks[x] = 1; });
+          keys(ks).forEach(function(key){
+            if (!jEq(cur[key], old[key])) {
+              meta.wh[q] = meta.wh[q] || {};
+              meta.wh[q][key] = now; touched = true;
+            }
+          });
+        });
+        snapHL = jclone(v) || {};
+      }
+    } catch(e){}
+    if (touched) { saveMeta(); dirty = true; scheduleSync(); }
+  };
+
+  saveDaily = function(){
+    origSaveDaily();
+    if (suppress) return;
+    dirty = true; scheduleSync();
+  };
+
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) flush(); else performSync('visible');
+  });
+  window.addEventListener('pagehide', flush);
+  window.addEventListener('beforeunload', flush);
+  window.addEventListener('online', function(){ performSync('online'); });
+  setInterval(function(){
+    if (document.hidden) return;
+    if (Date.now() - (meta.pull || 0) > PULL_EVERY) performSync('interval');
+  }, 30000);
+
+  if (chip) {
+    chip.addEventListener('click', function(){
+      if (busy) return;
+      toast('기록을 확인합니다…', 900);
+      performSync('user');
+    });
+  }
+
+  window.__syncDebug = {build: buildDoc, merge: mergeDocs, apply: applyDoc, url: URL_, meta: function(){ return meta; }};
+
+  setChip('', '확인 중', '기록을 확인하는 중입니다.');
+  performSync('load');
+})();
+
 </script>
 </body>
 </html>
