@@ -1219,6 +1219,44 @@ rebuild();
     } catch(e) { try { console.warn('[sync] 화면 갱신 실패', e); } catch(e2){} }
   }
 
+  /* 같은 브라우저의 다른 탭(예: 회계원리 공개용 페이지)이 쓴 내용을 흡수한다 */
+  function absorbExternalEdits(){
+    var changed = false;
+    try {
+      var st = readJSON(LS, null);
+      if (st && st.answers) {
+        var a = st.answers || {}, g = st.graded || {};
+        keys(a).forEach(function(k){
+          if (meta.w[k]) return;
+          if (!Object.prototype.hasOwnProperty.call(state.answers, k) && !Object.prototype.hasOwnProperty.call(state.graded, k)) {
+            state.answers[k] = a[k];
+            if (Object.prototype.hasOwnProperty.call(g, k)) state.graded[k] = g[k];
+            changed = true;
+          }
+        });
+        keys(g).forEach(function(k){
+          if (meta.w[k]) return;
+          if (!Object.prototype.hasOwnProperty.call(state.graded, k)) { state.graded[k] = g[k]; changed = true; }
+        });
+      }
+      var mi = readJSON(LSM, {}) || {};
+      keys(mi).forEach(function(k){ var v = mi[k] | 0; if (v > (mistakes[k] || 0)) { mistakes[k] = v; changed = true; } });
+      var mk = readJSON(LSK, {}) || {};
+      keys(mk).forEach(function(k){ if (!meta.wm[k] && mk[k] && !marks[k]) { marks[k] = 1; changed = true; } });
+      var hl = readJSON(LSH, {}) || {};
+      keys(hl).forEach(function(q){ keys(hl[q] || {}).forEach(function(key){
+        if (meta.wh[q] && meta.wh[q][key]) return;
+        if (!HLS[q] || !HLS[q][key]) { HLS[q] = HLS[q] || {}; HLS[q][key] = hl[q][key]; changed = true; }
+      }); });
+      var dl = loadDaily();
+      if (dl && dl.day === daily.day) keys(dl.ids).forEach(function(k){
+        var v = Math.max(daily.ids[k] || 0, dl.ids[k] || 0);
+        if (daily.ids[k] !== v) { daily.ids[k] = v; changed = true; }
+      });
+    } catch(e){}
+    return changed;
+  }
+
   /* ── 업로드·내려받기 ─────────────────────────────────────────────── */
   function b64(buf){
     var bytes = new Uint8Array(buf), out = '', CH = 0x8000;
@@ -1308,6 +1346,7 @@ rebuild();
     if (busy) { again = true; return; }
     busy = true;
     setChip('', '확인 중', '기록을 확인하는 중입니다.');
+    if (absorbExternalEdits()) dirty = true;
     getCloud(2)
       .then(function(cloud){
         meta.pull = Date.now();
@@ -1454,7 +1493,6 @@ rebuild();
   setChip('', '확인 중', '기록을 확인하는 중입니다.');
   performSync('load');
 })();
-
 </script>
 </body>
 </html>
