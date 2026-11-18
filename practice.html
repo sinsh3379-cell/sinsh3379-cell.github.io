@@ -262,6 +262,109 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 .syn.err{color:#a8382f;background:#fdeeec;border-color:#f3c9c4}
 @media (max-width:768px){.syn{font-size:10px;padding:2px 6px;gap:2px}}
 @media (max-width:430px){.syn{padding:2px 5px}.syn.ok .synt{display:none}}
+
+/* ═══ 4대 기능: 📌 핀 마킹 · ⭐ 자동 별표 · ⚠ 내가 고른 오답 · 🔢 숫자 전용 ═══ */
+.b.auto{letter-spacing:1.5px;border:1px solid #e7c96a;background:#fff8e1;color:#a2700a}
+.b.auto.s3{border-color:#e8a49c;background:#fdeeec;color:#a8382f}
+.b.auto.s2{border-color:#eccf92;background:#fffaf0;color:#8a6100}
+
+/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답 / 숫자 전용) ── */
+.selin.moderow{padding-top:0 !important;padding-bottom:7px !important;gap:0 !important}
+.modetabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%}
+.mtab{appearance:none;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:99px;
+  padding:7px 12px;font-size:13.5px;font-weight:800;cursor:pointer;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:5px;line-height:1.2;font-variant-numeric:tabular-nums}
+.mtab:active{background:#eef2f8}
+.mtab.on{background:var(--navy2);border-color:var(--navy2);color:#fff}
+.mtab .cnt{font-size:12px;font-weight:800;opacity:.62}
+.mtab.on .cnt{opacity:.88}
+.mtab.viewfp{border-color:#e8c9c4;color:#a8382f;background:#fdf3f1}
+.mtab.viewfp.on{background:#a8382f;border-color:#a8382f;color:#fff}
+.mtab.viewnum{border-color:#c9d6e8;color:#1d4f80;background:#f4f8ff}
+.mtab.viewnum.on{background:#123a63;border-color:#123a63;color:#fff}
+
+/* ── 숫자 가리기: 글자를 지우지 않고 투명 글자 + 회색 상자 ── */
+span.n{color:transparent;background:#e2e8f0;border:1px solid #94a3b8;border-radius:5px;
+  padding:0 4px;min-width:2.2em;display:inline-block;text-align:center;cursor:pointer;
+  user-select:none;-webkit-user-select:none;font-weight:inherit;letter-spacing:0;line-height:1.42}
+span.n:active{background:#cfd8e6}
+span.n.open{color:#B42318;background:#FDE68A;border-color:#E0A800;font-weight:800}
+
+/* ── ⚠ 내가 고른 오답 · 🔢 숫자 전용 공통 목록 ── */
+.card.plain{background:transparent;border:none;box-shadow:none;padding:0}
+.fphead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 2px 12px}
+.fphead .t{font-size:19px;font-weight:800;color:var(--navy)}
+.fphead .d{font-size:14px;color:var(--muted);font-weight:600;word-break:keep-all}
+.wrongwrap{display:flex;flex-direction:column;gap:14px}
+.wcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;
+  box-shadow:0 1px 2px rgba(18,58,99,.05)}
+.wtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.wtop .wunit{font-size:13.5px;font-weight:700;color:#4a5a72}
+.wtop .wcount{margin-left:auto;font-size:13px;font-weight:800;color:var(--red)}
+.wstem{font-size:20px;line-height:1.55;font-weight:700;color:#151c28}
+.wstem.ctx{font-size:16px;line-height:1.5;font-weight:600;color:#4a5a72}
+.wpicks{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.wpick{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 13px;
+  border:1.5px solid;font-size:19px;line-height:1.5}
+.wpick .lab{flex:0 0 auto;font-size:12.5px;font-weight:800;border-radius:7px;padding:3px 8px;
+  white-space:nowrap;margin-top:2px}
+.wpick .num{flex:0 0 auto;font-weight:800;font-size:20px;line-height:1.4}
+.wpick .tx{flex:1;min-width:0}
+.wpick.mine{border-color:#f0c8c3;background:#fdeeec}
+.wpick.mine .lab{background:#a8382f;color:#fff}
+.wpick.mine .num,.wpick.mine .tx{color:#7d2b24}
+.wpick.ans{border-color:#bfe3cc;background:#eaf7ef}
+.wpick.ans .lab{background:#1f6b41;color:#fff}
+.wpick.ans .num,.wpick.ans .tx{color:#175233}
+.wexp{margin-top:12px;border-top:1px dashed #e2e8f2;padding-top:10px;font-size:17px;line-height:1.65;color:#2a3a52}
+.wexp .wlab{display:block;color:var(--navy2);font-size:13.5px;font-weight:800;margin-bottom:3px}
+.wfoot{margin-top:18px;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.7}
+
+/* 숫자 전용 카드 */
+.nline{align-items:flex-start;border-color:#e2e8f2;background:#fbfcfe}
+.nline .num{color:#1d4f80;font-size:17px;min-width:1.1em;text-align:center}
+.nline .ox{display:none;flex:0 0 auto;font-size:11.5px;font-weight:900;border-radius:6px;
+  padding:2px 7px;margin-top:3px;border:1px solid}
+.nline .ox.o{background:#eaf7ef;color:#1f6b41;border-color:#bfe3cc}
+.nline .ox.x{background:#fdeeec;color:#a8382f;border-color:#f3c9c4}
+.nline .ox.a{background:#eef2f8;color:#33405a;border-color:#dbe2ee}
+.wcard.reveal .nline .ox{display:inline-block}
+.wcard.reveal .nline.ok{background:#f2faf5;border-color:#bfe3cc}
+.ncore{display:none}
+.wcard.reveal .ncore{display:block}
+.nbtn{appearance:none;margin-left:auto;border:1px solid #cfd6e2;background:#fff;color:#22314c;
+  border-radius:99px;padding:5px 11px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap}
+.nbtn.on{background:var(--navy2);border-color:var(--navy2);color:#fff}
+.nfoot{margin-top:8px;font-size:12.5px;color:var(--muted)}
+
+/* 목록 그리드의 📌 핀과 자동 별표 */
+.gi .st.pin{font-size:10.5px;line-height:1;top:-6px;right:-4px;color:inherit}
+.gi .ast{position:absolute;left:2px;bottom:-4px;font-size:9.5px;font-weight:900;color:#a2700a;
+  background:#fff8e1;border:1px solid #e7c96a;border-radius:5px;padding:0 2px;
+  letter-spacing:-.5px;line-height:1.35}
+.gi .ast.s3{color:#a8382f;background:#fdeeec;border-color:#e8a49c}
+
+@media (max-width:768px){
+  .mtab{padding:5px 9px;font-size:12px;gap:3px}
+  .mtab .cnt{font-size:10.5px}
+  .modetabs{gap:4px}
+  .fphead .t{font-size:16px} .fphead .d{font-size:12.5px}
+  .wcard{padding:12px 14px;border-radius:12px}
+  .wstem{font-size:15px;line-height:1.4}
+  .wstem.ctx{font-size:13px}
+  .wpick{font-size:14px;padding:8px 10px;border-radius:10px;gap:7px}
+  .wpick .num{font-size:15px} .wpick .lab{font-size:10.5px;padding:2px 6px}
+  .wexp{font-size:13.5px;line-height:1.5}
+  .nline .tx{font-size:14px}
+  .nbtn{font-size:11.5px;padding:4px 9px}
+  span.n{min-width:1.9em;padding:0 3px}
+}
+@media (max-width:430px){
+  .modetabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .mtab{justify-content:center;padding:5px 4px;font-size:11.5px;gap:3px}
+  .mtab .ic{display:none}
+  .mtab .cnt{font-size:10.5px}
+}
 </style>
 </head>
 <body>
@@ -287,8 +390,9 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
       <option value="mc">객관식만</option>
       <option value="short">주관식만</option>
     </select>
-    <select id="selView" title="보기 범위"></select>
+    <select id="selView" title="보기 범위" style="display:none"></select>
   </div>
+  <div class="selin moderow"><div class="modetabs" id="modeTabs"></div></div>
 </div>
 
 <div class="shell">
@@ -335,7 +439,7 @@ function load(){
                idx:0, view:'all', type:'all'};
   if (!s || !s.answers) return def;
   const st = {answers:s.answers||{}, graded:s.graded||{}, idx:s.idx||0,
-              view:s.view||'all', type:s.type||'all',
+              view:['all','mark','wrong','fp','num'].indexOf(s.view) >= 0 ? s.view : 'all', type:s.type||'all',
               part:s.part || s.law || s.major || '전체'};
   const u = (typeof s.unit === 'string') ? s.unit : '';
   if (u && u !== '__all' && u.indexOf('|') > 0) {
@@ -363,6 +467,30 @@ state = load();
 mistakes = readJSON(LSM, {}) || {};
 marks = readJSON(LSK, {}) || {};
 if (typeof marks !== 'object' || marks === null) marks = {};
+
+/* 📌 핀 마킹 · ⭐ 자동 별표 · ⚠ 처음 고른 오답 ─── 4대 기능 ─── */
+const LSF = LS + '_firstpick';                      // 처음 틀렸을 때 고른 선지
+let firstPick = readJSON(LSF, {}) || {};
+if (typeof firstPick !== 'object' || firstPick === null || Array.isArray(firstPick)) firstPick = {};
+(function normFP(){
+  const out = {};
+  Object.keys(firstPick).forEach(k => {
+    const e = firstPick[k];
+    if (Array.isArray(e)) { if (e[0]) out[k] = {n: e[0], t: e[1] || 0}; }
+    else if (e && typeof e === 'object' && e.n) out[k] = {n: e.n, t: e.t || 0};
+  });
+  firstPick = out;
+})();
+/* 자동 별표는 '누적 오답 횟수'에서 바로 계산한다(최대 ★★★).
+   오답 기록(mistakes)은 이미 기기 간 동기화 대상이라 따로 저장할 것이 없다. */
+function starLv(id){ return Math.min(3, mistakes[id] || 0); }
+/* 틀림 기록: 오답 +1, 자동 별표, 그리고 '처음' 고른 선지만 남긴다. */
+function markWrong(id, pick){
+  mistakes[id] = (mistakes[id] || 0) + 1;
+  writeJSON(LSM, mistakes);
+  if (pick && !firstPick[id]) { firstPick[id] = {n: pick, t: Date.now()}; writeJSON(LSF, firstPick); }
+  return starLv(id);
+}
 
 /* ── 오늘 푼 문제 (매일 새벽 6시 리셋) ─────────────────────────────── */
 function dayKey(){
@@ -599,16 +727,20 @@ function baseFilter(q){
 function matchView(q){
   if (state.view === 'mark') return !!marks[q.id];
   if (state.view === 'wrong') return (mistakes[q.id] || 0) > 0;
+  if (state.view === 'fp') return !!firstPick[q.id];      // 내가 고른 오답
+  if (state.view === 'num') return numRows(q).length > 0; // 핵심 숫자가 든 지문이 있는 문항
   return true;
 }
 function counts(){
-  let mark = 0, wrong = 0;
+  let mark = 0, wrong = 0, fp = 0, num = 0;
   DATA.forEach(q => {
     if (!matchBase(q)) return;
     if (marks[q.id]) mark++;
     if ((mistakes[q.id] || 0) > 0) wrong++;
+    if (firstPick[q.id]) fp++;
+    if (numRows(q).length) num++;
   });
-  return {mark, wrong};
+  return {mark, wrong, fp, num};
 }
 function buildSelectors(){
   const sl = document.getElementById('selPart');
@@ -652,11 +784,14 @@ function buildSelectors(){
   if (sv) {
     const c = counts();
     sv.innerHTML = `<option value="all">전체 문제 (${DATA.filter(matchBase).length})</option>` +
-      `<option value="mark">★ 마킹한 문제 (${c.mark})</option>` +
-      `<option value="wrong">✗ 틀린 문제 (${c.wrong})</option>`;
+      `<option value="mark">📌 핀 마킹한 문제 (${c.mark})</option>` +
+      `<option value="wrong">✗ 틀린 문제 (${c.wrong})</option>` +
+      `<option value="fp">⚠ 내가 고른 오답 (${c.fp})</option>` +
+      `<option value="num">🔢 숫자 전용 (${c.num})</option>`;
     sv.value = state.view || 'all';
     sv.onchange = () => { state.view = sv.value; state.idx = 0; rebuild(); };
   }
+  renderModeTabs();
 
   sl.onchange = () => { state.part = sl.value; state.unit = '전체 단원'; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
   su.onchange = () => { state.unit = su.value; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
@@ -666,8 +801,223 @@ function rebuild(){
   list = DATA.filter(q => baseFilter(q) && matchView(q));
   cur = Math.min(state.idx || 0, Math.max(0, list.length - 1));
   state.idx = cur;
-  render(); renderGrid(); renderScore();
+  if (state.view === 'fp') renderWrongList();
+  else if (state.view === 'num') renderNumList();
+  else render();
+  renderGrid(); renderScore();
 }
+
+/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답 / 숫자 전용) ── */
+const VIEWS = [
+  {v:'all',   ic:'📚', lb:'전체',          cls:''},
+  {v:'mark',  ic:'📌', lb:'핀 마킹',        cls:''},
+  {v:'wrong', ic:'✗',  lb:'틀린 문제',      cls:''},
+  {v:'fp',    ic:'⚠',  lb:'내가 고른 오답', cls:'viewfp '},
+  {v:'num',   ic:'🔢', lb:'숫자 전용',      cls:'viewnum '}
+];
+function renderModeTabs(){
+  const box = document.getElementById('modeTabs');
+  if (!box) return;
+  const c = counts();
+  const num = {all: DATA.filter(matchBase).length, mark: c.mark, wrong: c.wrong, fp: c.fp, num: c.num};
+  box.innerHTML = VIEWS.map(o =>
+    `<button type="button" class="mtab ${o.cls}${state.view === o.v ? 'on' : ''}" data-view="${o.v}">` +
+    `<span class="ic">${o.ic}</span><span class="lb">${o.lb}</span><span class="cnt">${num[o.v]}</span></button>`).join('');
+  box.querySelectorAll('.mtab').forEach(b => {
+    b.onclick = () => {
+      if (state.view === b.dataset.view) return;
+      state.view = b.dataset.view; state.idx = 0; save();
+      buildSelectors(); rebuild();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+  });
+}
+
+/* ── ⚠ 내가 고른 오답 전용 화면 ──────────────────────────────────────── */
+function renderWrongList(){
+  const card = document.getElementById('card');
+  card.classList.add('plain');
+  if (!list.length) {
+    card.innerHTML = `<div class="empty">아직 처음 틀린 문제가 없습니다.<br>` +
+      `문제를 틀리면 그때 고른 선지가 이곳에 따로 모입니다.</div>`;
+  } else {
+    card.innerHTML =
+      `<div class="fphead"><span class="t">⚠ 내가 고른 오답</span>` +
+      `<span class="d">처음 틀렸을 때 고른 선지와 실제 정답을 나란히 모았습니다 · ${list.length}문항</span></div>` +
+      `<div class="wrongwrap">` + list.map(wrongCard).join('') + `</div>` +
+      `<div class="wfoot">여기서는 문제를 풀지 않습니다. 풀려면 위의 ‘📚 전체’ 탭에서 이어서 보세요.</div>`;
+  }
+  updateProgress();
+}
+function wrongCard(q){
+  const fp = firstPick[q.id] || null;
+  const lv = starLv(q.id);
+  const mine = fp ? (q.choices || []).find(c => c.n === fp.n) : null;
+  const ansC = (q.choices || []).find(c => c.ans) || null;
+  return `<div class="wcard">
+    <div class="wtop">
+      <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
+      ${lv ? `<span class="b auto s${lv}" title="자동 별표 — 틀린 횟수만큼">${'★'.repeat(lv)}</span>` : ''}
+      <span class="wunit">${esc(q.unit || q.part || '')}</span>
+      <span class="wcount">오답 ${mistakes[q.id] || 0}회</span>
+    </div>
+    <div class="wstem hlz">${esc(q.stem)}</div>
+    <div class="wpicks">
+      <div class="wpick mine"><span class="lab">내가 처음 고른 오답</span>
+        <span class="num">${fp ? esc(fp.n) : '—'}</span>
+        <span class="tx hlz">${mine ? esc(mine.text) : '기록된 선지가 없습니다(단답형).'}</span></div>
+      <div class="wpick ans"><span class="lab">정답</span>
+        <span class="num">${ansC ? esc(ansC.n) : esc(q.ansText || '')}</span>
+        <span class="tx hlz">${ansC ? esc(ansC.text) : esc(q.core || '')}</span></div>
+    </div>
+    ${q.core ? `<div class="wexp"><div class="wlab">해설</div><span class="hlz">${esc(q.core)}</span></div>` : ''}
+  </div>`;
+}
+/* 목록에서 문항 번호를 누르면 그 문제로 이동(풀이 화면으로) */
+function focusQuestion(id){
+  state.view = 'all'; state.idx = 0; save();
+  buildSelectors();
+  list = DATA.filter(q => baseFilter(q) && matchView(q));
+  const i = list.findIndex(q => q.id === id);
+  state.idx = i >= 0 ? i : 0; save();
+  rebuild();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+/* ── 🔢 숫자 전용: 핵심 숫자가 들어 있는 지문만 ──────────────────────────
+   기간·비율·면적·금액 같은 함정 숫자만 '핵심 숫자'로 본다.
+   조문번호(제12조)·회차(제29회)·항목번호(1))·단위 없는 한 자리 숫자는 세지 않는다. */
+const NUM_UNIT = '제곱미터|평방미터|킬로미터|퍼센트|개월|시간|세대|만원|미터|㎡|평|년|월|일|회|층|호|명|km|cm|mm|%|배|원|억|만|천|점|개|곳|대|종|도|주|초|분|톤|kg|리터|ℓ';
+const NUM_RE = new RegExp('(\\d[\\d,.]*(?:\\s*분의\\s*\\d[\\d,.]*)?)(\\s*)(' + NUM_UNIT + ')?', 'g');
+const NUMCACHE = {};
+function numSpans(t){
+  const out = [];
+  if (!t) return out;
+  const re = new RegExp(NUM_RE.source, 'g');
+  let m;
+  while ((m = re.exec(t))) {
+    const tok = m[0].replace(/\s+$/, ''), start = m.index, unit = m[3] || '';
+    const digits = m[1].replace(/[^0-9]/g, '');
+    const prev = start > 0 ? t.charAt(start - 1) : '';
+    const next = t.charAt(start + tok.length);
+    if (!digits) continue;
+    if (prev === '제') continue;                       // 제12조 · 제29회
+    if (!unit && /[조항목]/.test(next)) continue;       // 12조 · 1항
+    if (/[.,]\s*$/.test(m[0])) continue;                // 날짜·목록 구분자(2020. 3. 2.)
+    if (/^[.,)]/.test(next)) continue;                  // 1) 항목번호
+    if (!unit && next === '번') continue;               // 1번
+    if (!unit && digits.length < 2) continue;           // 단위 없는 한 자리
+    out.push({s: start, e: start + tok.length, tx: tok});
+  }
+  return out;
+}
+function hasKeyNum(t){ return numSpans(t).length > 0; }
+/* 그 문항에서 '숫자가 든 지문'만 골라낸다(선지 → 없으면 단답 답안) */
+function numRows(q){
+  if (!q) return [];
+  if (NUMCACHE[q.id]) return NUMCACHE[q.id];
+  const out = [];
+  (q.choices || []).forEach(c => {
+    if (c.text && hasKeyNum(c.text))
+      out.push({n: c.n, tx: c.text, mk: c.mark || (c.ans ? 'O' : 'X'), ans: !!c.ans});
+  });
+  if (!out.length && (q.blanks || []).length) {
+    q.blanks.forEach((b, i) => {
+      if (b && hasKeyNum(b))
+        out.push({n: q.blanks.length > 1 ? '빈칸' + (i + 1) : '답', tx: b, mk: '정답', ans: true});
+    });
+  }
+  if (!out.length) {                       // 선지에 숫자가 없으면 해설 핵심 문장에서
+    [q.core].concat(q.paras || []).forEach(p => {
+      if (p && hasKeyNum(p)) out.push({n: '해설', tx: p, mk: '', ans: false});
+    });
+  }
+  NUMCACHE[q.id] = out;
+  return out;
+}
+function renderNumList(){
+  const card = document.getElementById('card');
+  card.classList.add('plain');
+  let rows = 0;
+  list.forEach(q => { rows += numRows(q).length; });
+  if (!list.length) {
+    card.innerHTML = `<div class="empty">핵심 숫자가 들어 있는 문제가 없습니다.<br>위의 단원·유형 조건을 바꿔 보세요.</div>`;
+  } else {
+    card.innerHTML =
+      `<div class="fphead"><span class="t">🔢 숫자 전용</span>` +
+      `<span class="d">핵심 숫자(기간·비율·면적·금액)가 든 지문만 모았습니다 · ${list.length}문항 ${rows}지문</span></div>` +
+      `<div class="wrongwrap">` + list.map(numCard).join('') + `</div>` +
+      `<div class="wfoot">회색 상자를 누르면 숫자가 열립니다 · 각 문항의 ‘정답 보기’로 O·X와 해설을 확인하세요.</div>`;
+    applyNumMask(card);
+    card.querySelectorAll('.nbtn').forEach(b => {
+      b.onclick = () => {
+        const wc = b.closest('.wcard');
+        const on = wc.classList.toggle('reveal');
+        b.classList.toggle('on', on);
+        b.textContent = on ? '정답 숨기기' : '정답 보기';
+      };
+    });
+  }
+  updateProgress();
+}
+function numCard(q){
+  const lv = starLv(q.id);
+  const rs = numRows(q);
+  const stemHas = hasKeyNum(q.stem || '');
+  const rows = rs.map((r, i) =>
+    `<div class="wpick nline${r.ans ? ' ok' : ''}"><span class="num">${esc(r.n)}</span>` +
+    `<span class="tx hlz" data-n="${i}">${esc(r.tx)}</span>` +
+    (r.mk ? `<span class="ox ${r.mk === 'O' ? 'o' : (r.mk === 'X' ? 'x' : 'a')}">${esc(r.mk)}</span>` : '') +
+    `</div>`).join('');
+  return `<div class="wcard">
+    <div class="wtop">
+      <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
+      ${lv ? `<span class="b auto s${lv}" title="자동 별표 — 틀린 횟수만큼">${'★'.repeat(lv)}</span>` : ''}
+      <span class="wunit">${esc(q.unit || q.part || '')}</span>
+      <button type="button" class="nbtn">정답 보기</button>
+    </div>
+    <div class="wstem ctx hlz">${esc(q.stem)}</div>
+    <div class="wpicks">${rows}</div>
+    ${q.core ? `<div class="wexp ncore"><div class="wlab">해설</div><span class="hlz">${esc(q.core)}</span></div>` : ''}
+  </div>`;
+}
+/* 숫자를 회색 상자로 덮는다 — 이 화면(🔢 숫자 전용)에서만 쓴다 */
+const MASK_SKIP = 'span.n,mark.user-hl,.b,.mtab,#progtxt,.num,.wtop,.nbtn,.ox,.wlab,.wfoot,.fphead';
+function maskOneNode(node){
+  const t = node.nodeValue;
+  const hits = numSpans(t);
+  if (!hits.length) return;
+  const frag = document.createDocumentFragment();
+  let pos = 0;
+  hits.forEach(h => {
+    if (h.s > pos) frag.appendChild(document.createTextNode(t.slice(pos, h.s)));
+    const b = document.createElement('span');
+    b.className = 'n'; b.textContent = h.tx;
+    frag.appendChild(b);
+    pos = h.e;
+  });
+  if (pos < t.length) frag.appendChild(document.createTextNode(t.slice(pos)));
+  node.parentNode.replaceChild(frag, node);
+}
+function applyNumMask(root){
+  if (!root) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes = []; let nd;
+  while ((nd = w.nextNode())) {
+    const p = nd.parentElement;
+    if (!p || p.closest(MASK_SKIP)) continue;
+    if (!nd.nodeValue || !/\d/.test(nd.nodeValue)) continue;
+    nodes.push(nd);
+  }
+  nodes.forEach(maskOneNode);
+}
+/* 회색 상자를 누르면 그 숫자만 보인다 */
+document.addEventListener('click', e => {
+  const b = e.target && e.target.closest ? e.target.closest('span.n') : null;
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  b.classList.toggle('open');
+}, true);
 
 /* ── 렌더 ─────────────────────────────────────────────────────────── */
 function diffBadge(q){
@@ -687,6 +1037,7 @@ function rdText(n){
 }
 function render(){
   const card = document.getElementById('card');
+  card.classList.remove('plain');
   const q = list[cur];
   if (!q) {
     card.innerHTML = `<div class="empty">이 조건에 해당하는 문제가 없습니다.<br>위의 단원·보기 조건을 바꿔 보세요.</div>`;
@@ -787,12 +1138,13 @@ function render(){
           <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
           ${diffBadge(q)}
           ${stored ? `<span class="b miss">누적 오답 ${stored}회</span>` : ''}
+          ${starLv(q.id) ? `<span class="b auto s${starLv(q.id)}" title="자동 별표 — 틀린 횟수만큼 붙습니다(최대 3개)">${'★'.repeat(starLv(q.id))}</span>` : ''}
         </div>
         <div class="stem hlz" data-hl="stem">${q.stemBr ? esc(q.stem).replace(/○/g, '<br>○') : esc(q.stem)}</div>
       </div>
       <div class="qtools">
         <button class="hlbtn ${hlOn ? 'on' : ''}" id="btnHL" title="형광펜 모드 켜기/끄기">🖍️ 형광펜</button>
-        <button class="star ${isM ? 'on' : ''}" id="btnStar" title="중요 문제 마킹">${isM ? '★' : '☆'}</button>
+        <button class="star ${isM ? 'on' : ''}" id="btnStar" title="${isM ? '핀 마킹 끄기' : '이 문제에 핀 꽂기'}" aria-label="핀 마킹">📌</button>
       </div>
     </div>
     ${intro}${bogi}${tables}${img}${opts}
@@ -817,9 +1169,10 @@ function render(){
         return;
       }
       state.graded[q.id] = !!c.ans;
-      if (!c.ans) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); }
+      const lv = c.ans ? 0 : markWrong(q.id, n);
       save(); markDaily(q.id, !!c.ans);
       render(); renderGrid(); renderScore(); buildSelectors();
+      if (lv) toast('틀렸습니다 — 자동 별표 ' + '★'.repeat(lv) + '  (오답 ' + mistakes[q.id] + '회)', 2200);
     };
   });
 
@@ -846,7 +1199,7 @@ function render(){
     writeJSON(LSK, marks);
     if (state.view === 'mark') { buildSelectors(); rebuild(); }
     else { render(); renderGrid(); renderScore(); buildSelectors(); }
-    toast(marks[q.id] ? '중요 문제로 마킹했습니다.' : '마킹을 해제했습니다.');
+    toast(marks[q.id] ? '📌 핀을 꽂았습니다.' : '📌 핀을 뺐습니다.');
   };
   const br = document.getElementById('btnRetry');
   if (br) br.onclick = () => {
@@ -886,12 +1239,13 @@ function gradeShort(){
     return a && (a === b || (a.length >= 2 && b.indexOf(a) >= 0));
   });
   state.graded[q.id] = ok;
-  if (!ok) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); }
+  if (!ok) markWrong(q.id, null);
   save(); markDaily(q.id, ok);
   render(); renderGrid(); renderScore(); buildSelectors();
 }
 
 function go(d){
+  if (state.view === 'fp' || state.view === 'num') return;   // 목록 화면에서는 문항 이동 없음
   const n = cur + d;
   if (n < 0 || n >= list.length) { toast(d > 0 ? '마지막 문제입니다.' : '첫 문제입니다.'); return; }
   cur = n; state.idx = n; save(); render();
@@ -899,6 +1253,11 @@ function go(d){
 }
 function updateProgress(){
   const txt = document.getElementById('progtxt'), fill = document.getElementById('progfill');
+  if (state.view === 'fp' || state.view === 'num') {
+    txt.textContent = (state.view === 'fp' ? '⚠ 내가 고른 오답 ' : '🔢 숫자 전용 ') + list.length + '문항';
+    fill.style.width = '100%';
+    return;
+  }
   const total = list.length || 1;
   const done = list.filter(q => state.graded[q.id] !== undefined && state.graded[q.id] !== null).length;
   txt.textContent = `${cur + 1} / ${total} 풀이 · 확인 ${done}`;
@@ -912,17 +1271,23 @@ function renderGrid(){
     if (gr === true) cls += ' done';
     else if (gr === false) cls += ' bad';
     if (i === cur) cls += ' cur';
-    const st = marks[q.id] ? '<span class="st">★</span>' : '';
+    const st = marks[q.id] ? '<span class="st pin">📌</span>' : '';
+    const lv = starLv(q.id);
+    const ast = lv ? `<span class="ast s${lv}">${'★'.repeat(lv)}</span>` : '';
     const mc = (mistakes[q.id] || 0) ? `<span class="mc">${mistakes[q.id]}</span>` : '';
-    return `<div class="${cls}" data-i="${i}">${i + 1}${st}${mc}</div>`;
+    return `<div class="${cls}" data-i="${i}">${i + 1}${st}${ast}${mc}</div>`;
   }).join('');
   g.querySelectorAll('.gi').forEach(el => {
-    el.onclick = () => { cur = +el.dataset.i; state.idx = cur; save(); render(); renderGrid(); closeDrawer(); };
+    el.onclick = () => {
+      const qi = +el.dataset.i;
+      if (state.view === 'fp' || state.view === 'num') { closeDrawer(); focusQuestion((list[qi] || {}).id); return; }
+      cur = qi; state.idx = cur; save(); render(); renderGrid(); closeDrawer();
+    };
   });
 }
 function renderScore(){
   const ids = new Set(DATA.map(q => q.id));
-  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0;
+  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, fpQ = 0, numQ = 0;
   Object.keys(state.graded || {}).forEach(k => {
     if (!ids.has(k)) return;
     const v = state.graded[k];
@@ -933,10 +1298,13 @@ function renderScore(){
     const m = mistakes[q.id] || 0;
     if (m > 0) { wrongQ++; totWrong += m; }
     if (marks[q.id]) marked++;
+    if (firstPick[q.id]) fpQ++;
+    if (numRows(q).length) numQ++;
   });
   document.getElementById('score').innerHTML =
     `확인 <b>${done}</b>문항 · 맞음 <b>${right}</b>` + (done ? ` · 정답률 <b>${Math.round(right / done * 100)}%</b>` : '') +
-    `<br>★ 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회)`;
+    `<br>📌 핀 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회)` +
+    `<br>⚠ 내가 고른 오답 <b>${fpQ}</b>개 · 🔢 숫자 문항 <b>${numQ}</b>개`;
   const sc = document.getElementById('sideCount');
   if (sc) sc.textContent = `${list.length}문항`;
   renderDaily();
@@ -1009,6 +1377,7 @@ rebuild();
 
   var snapAns = jclone(state.answers || {}), snapGraded = jclone(state.graded || {});
   var snapMis = jclone(mistakes), snapMarks = jclone(marks), snapHL = jclone(HLS);
+  var snapFP = jclone(firstPick);
 
   var chip = document.getElementById('synchip');
   function setChip(kind, label, title){
@@ -1026,12 +1395,12 @@ rebuild();
     var dayN = 0;
     keys(d.day).forEach(function(k){ dayN += keys(d.day[k]).length; });
     return !keys(d.ans).length && !keys(d.mis).length && !keys(d.mk).length &&
-           !keys(d.hl).length && !dayN;
+           !keys(d.hl).length && !keys(d.fp).length && !dayN;
   }
 
   /* ── 로컬 상태 → 클라우드 문서 ─────────────────────────────────────── */
   function buildDoc(){
-    var doc = {v:1, u:Date.now(), ans:{}, mis:{}, mk:{}, hl:{}, day:{}};
+    var doc = {v:1, u:Date.now(), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}};
     var a = state.answers || {}, g = state.graded || {};
 
     var ids = {};
@@ -1051,6 +1420,12 @@ rebuild();
     });
 
     keys(mistakes).forEach(function(k){ var n = mistakes[k] | 0; if (n > 0) doc.mis[k] = n; });
+
+    /* ⚠ 처음 고른 오답 선지 — [선지기호, 시각]  (자동 별표는 mis에서 계산) */
+    keys(firstPick).forEach(function(k){
+      var e = firstPick[k];
+      if (e && e.n) doc.fp[k] = [e.n, e.t || 0];
+    });
 
     keys(meta.wm).forEach(function(k){ if (!marks[k]) doc.mk[k] = [0, meta.wm[k] || 0]; });
     keys(marks).forEach(function(k){ if (marks[k]) doc.mk[k] = [1, meta.wm[k] || 0]; });
@@ -1088,7 +1463,7 @@ rebuild();
     return (ls >= cs) ? l : c;                          // 결정적 tie-break(두 기기 결과 동일)
   }
   function mergeDocs(L, C){
-    var out = {v:1, u:Math.max(L.u || 0, C.u || 0), ans:{}, mis:{}, mk:{}, hl:{}, day:{}};
+    var out = {v:1, u:Math.max(L.u || 0, C.u || 0), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}};
     var set = {};
     keys(L.ans).forEach(function(k){ set[k] = 1; }); keys(C.ans).forEach(function(k){ set[k] = 1; });
     keys(set).forEach(function(k){
@@ -1100,6 +1475,14 @@ rebuild();
     var s2 = {};
     keys(L.mis).forEach(function(k){ s2[k] = 1; }); keys(C.mis).forEach(function(k){ s2[k] = 1; });
     keys(s2).forEach(function(k){ out.mis[k] = Math.max(L.mis[k] || 0, C.mis[k] || 0); });
+    var sfp = {};
+    keys(L.fp).forEach(function(k){ sfp[k] = 1; }); keys(C.fp).forEach(function(k){ sfp[k] = 1; });
+    keys(sfp).forEach(function(k){
+      var l = L.fp[k], c = C.fp[k];
+      if (!l) out.fp[k] = c.slice();
+      else if (!c) out.fp[k] = l.slice();
+      else out.fp[k] = ((l[1] || 0) <= (c[1] || 0)) ? l.slice() : c.slice();   // 가장 처음 고른 쪽
+    });
     var s3 = {};
     keys(L.mk).forEach(function(k){ s3[k] = 1; }); keys(C.mk).forEach(function(k){ s3[k] = 1; });
     keys(s3).forEach(function(k){
@@ -1162,6 +1545,14 @@ rebuild();
       if (!jEq(mi, mistakes)) redraw = true;
       mistakes = mi;
 
+      var fpo = {};
+      keys(doc.fp).forEach(function(k){
+        var e = doc.fp[k];
+        if (Array.isArray(e) && e[0]) fpo[k] = {n: e[0], t: e[1] || 0};
+      });
+      if (!jEq(fpo, firstPick)) redraw = true;
+      firstPick = fpo;
+
       var mk = {};
       keys(doc.mk).forEach(function(k){ var e = doc.mk[k]; if (Array.isArray(e) && e[0]) mk[k] = 1; meta.wm[k] = e[1] || 0; });
       if (!jEq(mk, marks)) redraw = true;
@@ -1197,6 +1588,7 @@ rebuild();
       origWriteJSON(LSM, mistakes);
       origWriteJSON(LSK, marks);
       origWriteJSON(LSH, HLS);
+      origWriteJSON(LSF, firstPick);
       origSaveDaily();
       saveMeta();
     } catch(e) {
@@ -1205,6 +1597,7 @@ rebuild();
       suppress = false;
       snapAns = jclone(state.answers || {}); snapGraded = jclone(state.graded || {});
       snapMis = jclone(mistakes); snapMarks = jclone(marks); snapHL = jclone(HLS);
+      snapFP = jclone(firstPick);
       dirty = false;
     }
     if (redraw) redrawView();
@@ -1248,6 +1641,13 @@ rebuild();
         if (meta.wh[q] && meta.wh[q][key]) return;
         if (!HLS[q] || !HLS[q][key]) { HLS[q] = HLS[q] || {}; HLS[q][key] = hl[q][key]; changed = true; }
       }); });
+      var fpL = readJSON(LSF, {}) || {};
+      keys(fpL).forEach(function(k){
+        var e = fpL[k];
+        if (!e) return;
+        var ent = Array.isArray(e) ? {n: e[0], t: e[1] || 0} : e;
+        if (ent && ent.n && !firstPick[k]) { firstPick[k] = ent; changed = true; }
+      });
       var dl = loadDaily();
       if (dl && dl.day === daily.day) keys(dl.ids).forEach(function(k){
         var v = Math.max(daily.ids[k] || 0, dl.ids[k] || 0);
@@ -1289,6 +1689,7 @@ rebuild();
     d.mk  = (d.mk  && typeof d.mk  === 'object') ? d.mk  : {};
     d.mis = (d.mis && typeof d.mis === 'object') ? d.mis : {};
     d.day = (d.day && typeof d.day === 'object') ? d.day : {};
+    d.fp  = (d.fp  && typeof d.fp  === 'object') ? d.fp  : {};
     return d;
   }
   function unpack(obj){
@@ -1443,6 +1844,8 @@ rebuild();
           if (!!v[x] !== !!snapMarks[x]) { meta.wm[x] = now; touched = true; }
         });
         snapMarks = jclone(v) || {};
+      } else if (k === LSF) {
+        if (!jEq(v, snapFP)) { touched = true; snapFP = jclone(v) || {}; }
       } else if (k === LSH) {
         var qs = {};
         keys(v).forEach(function(x){ qs[x] = 1; }); keys(snapHL).forEach(function(x){ qs[x] = 1; });
