@@ -477,20 +477,39 @@ if (typeof firstPick !== 'object' || firstPick === null || Array.isArray(firstPi
   });
   firstPick = out;
 })();
-/* 기능 배포 전에 쌓인 오답(mistakes) 중 firstPick이 없는 기록을 답안에서 되살린다 */
+/* 기능 배포 전에 쌓인 '옛 오답'을 되살린다.
+   ① 채점 결과는 '틀림'인데 누적 오답 기록(mistakes)이 비어 있는 옛 오답 → mistakes[id] = 1
+      (목록에는 빨간색인데 '틀린 문제'·자동 별표·단원 집계에서 빠져 있던 문항)
+   ② firstPick이 없는 기록 → 저장된 답안에서 처음 고른 선지를 되살린다(정답을 고른 기록은 제외) */
 (function backfillFP(){
-  let ch = false;
-  Object.keys(mistakes).forEach(id => {
-    if ((mistakes[id] || 0) <= 0 || firstPick[id]) return;
-    const a = state.answers[id], g = state.graded[id];
-    if (typeof a === 'string' && a) { firstPick[id] = {n: a, t: 0, back: 1}; ch = true; }
-    else if (Array.isArray(a)) {
+  if (!mistakes || typeof mistakes !== 'object' || Array.isArray(mistakes)) mistakes = {};
+  if (!firstPick || typeof firstPick !== 'object' || Array.isArray(firstPick)) firstPick = {};
+  let chM = false, chF = false;
+  const byId = {};
+  DATA.forEach(q => { byId[q.id] = q; });
+  const ids = {};
+  Object.keys(mistakes).forEach(id => { ids[id] = 1; });
+  Object.keys(state.graded || {}).forEach(id => { ids[id] = 1; });   /* 옛 오답은 graded에만 남아 있다 */
+  Object.keys(ids).forEach(id => {
+    const q = byId[id]; if (!q) return;                      /* 지금 문제집에 없는 문항은 건드리지 않는다 */
+    const a = (state.answers || {})[id], g = state.graded[id];
+    const right = (q.choices && q.choices.length)
+      ? (((q.choices.filter(c => c.ans)[0]) || {}).n || '') : (q.ansText || '');
+    /* ① 옛 오답 복원 — 이미 기록된 오답 횟수는 그대로 둔다 */
+    if (g === false && (mistakes[id] || 0) <= 0) { mistakes[id] = 1; chM = true; }
+    if (firstPick[id]) return;
+    /* ② 처음 고른 선지 복원 */
+    if (typeof a === 'string' && a) {
+      if (a === right) return;                               /* 정답을 고른 기록이면 오답이 아니다 */
+      firstPick[id] = {n: a, t: 0, back: 1}; chF = true;
+    } else if (Array.isArray(a)) {
       const s = a.filter(x => x && String(x).trim()).join(' / ');
       firstPick[id] = s ? {n: '', s: s, t: 0, back: 1} : {n: '', s: '', t: 0, back: 1};
-      ch = true;
-    } else if (g === false) { firstPick[id] = {n: '', s: '', t: 0, back: 1}; ch = true; }
+      chF = true;
+    } else if (g === false) { firstPick[id] = {n: '', s: '', t: 0, back: 1}; chF = true; }
   });
-  if (ch) writeJSON(LSF, firstPick);
+  if (chM) writeJSON(LSM, mistakes);
+  if (chF) writeJSON(LSF, firstPick);
 })();
 /* 자동 별표는 '누적 오답 횟수'에서 바로 계산한다(최대 ★★★).
    오답 기록(mistakes)은 이미 기기 간 동기화 대상이라 따로 저장할 것이 없다. */
