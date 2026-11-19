@@ -1898,7 +1898,9 @@ rebuild();
         var cloudHas = !!(cloud && !isEmptyDoc(cloud));
         var merged = cloudHas ? mergeDocs(local, cloud) : local;
         applyDoc(merged);
-        merged = buildDoc();          /* 옛 오답 복원 등 화면에 반영된 결과까지 담아 비교·업로드 */
+        var rebuilt = buildDoc();     /* 옛 오답 복원 등 화면에 반영된 결과까지 담아 비교·업로드 */
+        rebuilt.day = merged.day;     /* 푼 날짜 버킷(지난 날 포함)은 병합 결과를 그대로 둔다 */
+        merged = rebuilt;
         saveMeta();
         if (isEmptyDoc(merged)) { setChip('ok', '동기화됨', '아직 올릴 기록이 없습니다.'); return null; }
         if (!cloudHas) return pushDoc(merged);                       // 첫 올리기(빈 저장소 채우기)
