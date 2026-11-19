@@ -754,11 +754,7 @@ function onCardClick(e){
     e.preventDefault(); e.stopPropagation();
     return;
   }
-  const line = (t && t.closest) ? (t.closest('.bogi .bi') || t.closest('.opt') || t.closest('#card .exp [data-hl]')) : null;
-  if (line) {
-    const z = (line.matches && line.matches('[data-hl]')) ? line : line.querySelector('[data-hl]');
-    if (z) { e.preventDefault(); toggleLine(z.dataset.hl); }
-  }
+  /* 단순 클릭·탭으로는 칠하지 않는다 — 글자를 드래그해 선택한 범위만 형광펜이 적용된다 */
 }
 
 /* ── 선택·필터 ─────────────────────────────────────────────────────── */
@@ -1311,7 +1307,7 @@ function render(){
     bh.classList.toggle('on', hlOn);
     if (!hlOn) hideFloat();
     toast(hlOn
-      ? '형광펜 모드 — 글자를 드래그하거나 보기·선지 줄을 터치하세요. 칠한 곳을 누르면 지워집니다.'
+      ? '형광펜 모드 — 글자를 드래그해 선택하세요. 칠한 곳을 누르면 지워집니다.'
       : '형광펜 모드를 껐습니다. (칠한 표시는 그대로 남습니다)', hlOn ? 2800 : 1600);
   };
   document.getElementById('btnPrev').onclick = () => go(-1);
@@ -1349,25 +1345,44 @@ function gradeShort(){
   render(); renderGrid(); renderScore(); buildSelectors();
 }
 
+/* 전체 PART의 단원을 PART 순서대로 이어 붙인 목록 — PART 경계를 넘어 이동한다 */
 function unitSeq(){
-  return unitsOfPart().filter(u => DATA.some(q => q.part === u.part && q.unit === u.name));
+  const seen = {}, out = [];
+  const push = u => {
+    const k = u.part + '\u0001' + u.name;
+    if (seen[k]) return;
+    seen[k] = 1;
+    if (DATA.some(q => q.part === u.part && q.unit === u.name)) out.push(u);
+  };
+  META.parts.forEach(p => META.units.forEach(u => { if (u.part === p.name) push(u); }));
+  META.units.forEach(push);                       // META.parts에 없는 PART의 단원도 뒤에 붙인다
+  return out;
 }
-function countInUnit(nm){
-  return DATA.filter(q => (state.part === '전체' || q.part === state.part) && q.unit === nm && matchView(q)).length;
+function countInUnit(u){
+  const part = (u && u.part) || state.part;
+  const nm = (u && u.name) || u;
+  return DATA.filter(q => (part === '전체' || q.part === part) && q.unit === nm && matchView(q)).length;
 }
-/* 단원 마지막 문제에서 '다음 →'을 누르면 다음 단원 첫 문제로 넘어간다 */
+/* 단원 마지막 문제에서 '다음 →'을 누르면 다음 단원 첫 문제로,
+   그 PART의 마지막 단원이면 다음 PART에서 현재 보기에 문항이 있는 첫 단원으로 넘어간다 */
 function jumpUnit(dir){
   if (state.view !== 'all' && state.view !== 'wrong' && state.view !== 'mark') return false;
   if (state.unit === '전체 단원') return false;
   const seq = unitSeq();
-  const i = seq.findIndex(u => u.name === state.unit);
+  const i = seq.findIndex(u => u.name === state.unit && (state.part === '전체' || u.part === state.part));
   if (i < 0) return false;
   for (let j = i + dir; j >= 0 && j < seq.length; j += dir) {
-    const nm = seq[j].name;
-    if (!countInUnit(nm)) continue;
-    state.unit = nm; state.sub = '전체 세부'; state.idx = 0; save();
+    const u = seq[j];
+    if (!countInUnit(u)) continue;
+    if (state.part !== '전체') state.part = u.part;
+    state.unit = u.name; state.sub = '전체 세부'; state.idx = 0;
     buildSelectors(); rebuild();
-    toast(nm + (dir > 0 ? ' 첫 문제입니다' : ' 마지막 문제입니다'), 1800);
+    if (dir < 0 && list.length) {              // 이전 단원은 그 단원의 마지막 문제로 들어간다
+      cur = list.length - 1; state.idx = cur; save();
+      render(); renderGrid(); updateProgress();
+    } else save();
+    const crossed = seq[i].part !== u.part;
+    toast((crossed ? u.part + ' · ' : '') + u.name + (dir > 0 ? ' 첫 문제입니다' : ' 마지막 문제입니다'), 2000);
     window.scrollTo({top: 0, behavior: 'smooth'});
     return true;
   }
