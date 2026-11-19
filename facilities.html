@@ -481,7 +481,7 @@ if (typeof firstPick !== 'object' || firstPick === null || Array.isArray(firstPi
    ① 채점 결과는 '틀림'인데 누적 오답 기록(mistakes)이 비어 있는 옛 오답 → mistakes[id] = 1
       (목록에는 빨간색인데 '틀린 문제'·자동 별표·단원 집계에서 빠져 있던 문항)
    ② firstPick이 없는 기록 → 저장된 답안에서 처음 고른 선지를 되살린다(정답을 고른 기록은 제외) */
-(function backfillFP(){
+function backfillFP(){
   if (!mistakes || typeof mistakes !== 'object' || Array.isArray(mistakes)) mistakes = {};
   if (!firstPick || typeof firstPick !== 'object' || Array.isArray(firstPick)) firstPick = {};
   let chM = false, chF = false;
@@ -510,7 +510,9 @@ if (typeof firstPick !== 'object' || firstPick === null || Array.isArray(firstPi
   });
   if (chM) writeJSON(LSM, mistakes);
   if (chF) writeJSON(LSF, firstPick);
-})();
+  return chM || chF;
+}
+backfillFP();   /* 페이지를 열 때 한 번 */
 /* 자동 별표는 '누적 오답 횟수'에서 바로 계산한다(최대 ★★★).
    오답 기록(mistakes)은 이미 기기 간 동기화 대상이라 따로 저장할 것이 없다. */
 function starLv(id){ return Math.min(3, mistakes[id] || 0); }
@@ -1666,6 +1668,9 @@ rebuild();
       if (!jEq(fpo, firstPick)) redraw = true;
       firstPick = fpo;
 
+      /* 다른 기기에서 처음 열어 내려온 기록만 있어도 '옛 오답'을 되살린다 */
+      if (backfillFP()) redraw = true;
+
       var mk = {};
       keys(doc.mk).forEach(function(k){ var e = doc.mk[k]; if (Array.isArray(e) && e[0]) mk[k] = 1; meta.wm[k] = e[1] || 0; });
       if (!jEq(mk, marks)) redraw = true;
@@ -1868,6 +1873,7 @@ rebuild();
         var cloudHas = !!(cloud && !isEmptyDoc(cloud));
         var merged = cloudHas ? mergeDocs(local, cloud) : local;
         applyDoc(merged);
+        merged = buildDoc();          /* 옛 오답 복원 등 화면에 반영된 결과까지 담아 비교·업로드 */
         saveMeta();
         if (isEmptyDoc(merged)) { setChip('ok', '동기화됨', '아직 올릴 기록이 없습니다.'); return null; }
         if (!cloudHas) return pushDoc(merged);                       // 첫 올리기(빈 저장소 채우기)
