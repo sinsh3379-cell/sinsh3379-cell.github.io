@@ -508,10 +508,19 @@ function backfillFP(){
       if (a === right) return;                               /* 정답을 고른 기록이면 오답이 아니다 */
       firstPick[id] = {n: a, t: 0, back: 1}; chF = true;
     } else if (Array.isArray(a)) {
+      if (g !== false) return;                               /* 단답형도 '틀린' 기록일 때만 오답이다 */
       const s = a.filter(x => x && String(x).trim()).join(' / ');
       firstPick[id] = s ? {n: '', s: s, t: 0, back: 1} : {n: '', s: '', t: 0, back: 1};
       chF = true;
     } else if (g === false) { firstPick[id] = {n: '', s: '', t: 0, back: 1}; chF = true; }
+  });
+  /* 잘못 남은 기록 정리 — 누적 오답이 없고 지금 맞힌 문항의 '되살린' 기록은 오답이 아니다 */
+  Object.keys(firstPick).forEach(id => {
+    const e = firstPick[id];
+    if (!e || (e.t || 0) > 0) return;                        /* 푸는 중에 남긴 기록(t>0)은 건드리지 않는다 */
+    if ((mistakes[id] || 0) > 0) return;
+    if (state.graded[id] !== true) return;
+    delete firstPick[id]; chF = true;
   });
   if (chM) writeJSON(LSM, mistakes);
   if (chF) writeJSON(LSF, firstPick);
