@@ -586,6 +586,8 @@ let hlOn = !!readJSON(LS + '_hlon', false);
 let HLS = readJSON(LSH, {});
 if (!HLS || typeof HLS !== 'object' || Array.isArray(HLS)) HLS = {};
 let lastPaint = 0;
+let lastValidHL = null;              // 마지막으로 유효했던 선택 범위(터치에서 선택이 풀려도 남겨 둔다)
+let lastApplyTs = 0;                 // touchend·click 중복 실행 방지
 
 function hlStore(id){
   const s = HLS[id];
@@ -726,6 +728,7 @@ function updateFloat(){
   if (!hlOn) { hideFloat(); return; }
   const hit = hlSelection();
   if (!hit) { hideFloat(); return; }
+  lastValidHL = hit;                                 // 선택이 풀리기 전에 범위를 기억해 둔다
   const sel = window.getSelection();
   const rect = sel.getRangeAt(0).getBoundingClientRect();
   f.classList.add('show');
@@ -738,13 +741,24 @@ function updateFloat(){
   f.style.top = top + 'px';
 }
 function applyHLSelection(){
-  const hit = hlSelection();
+  const hit = hlSelection() || lastValidHL;          // 터치에서 선택이 풀렸으면 마지막 유효 선택을 쓴다
   if (!hit) return false;
-  addRange(hit.key, hit.start, hit.end);
+  lastValidHL = null;
   const sel = window.getSelection();
-  if (sel) sel.removeAllRanges();
+  if (sel) sel.removeAllRanges();                    // DOM을 바꾸기 전에 선택부터 풀어야 끊기지 않는다
+  addRange(hit.key, hit.start, hit.end);
   hideFloat();
   return true;
+}
+/* 🖍️ 칠하기 버튼 처리 — touchend 와 click 이 겹쳐도 한 번만 실행한다 */
+function tryApplyHL(){
+  const hit = hlSelection() || lastValidHL;
+  if (!hit) return false;
+  if (!document.querySelector('#card [data-hl="' + hit.key + '"]')) { lastValidHL = null; return false; }
+  const now = Date.now();
+  if (now - lastApplyTs < 400) return false;
+  lastApplyTs = now;
+  return applyHLSelection();
 }
 function onCardClick(e){
   if (!hlOn) return;
@@ -1117,6 +1131,7 @@ function rdText(n, qr){
   return `<span class="rd">(${n.art ? n.art + ' · ' : ''}${rtxt})</span>`;
 }
 function render(){
+  lastValidHL = null;                                // 화면이 바뀌면 이전 선택 범위는 버린다
   const card = document.getElementById('card');
   card.classList.remove('plain');
   const q = list[cur];
@@ -1462,11 +1477,27 @@ document.getElementById('btnList').onclick = () => {
 document.getElementById('btnClose').onclick = closeDrawer;
 
 document.getElementById('card').addEventListener('click', onCardClick);
+/* 터치에서는 click 이 오지 않는 경우가 있어, 칠해 둔 형광펜 탭 지우기를 touchend 에서도 받는다 */
+document.getElementById('card').addEventListener('touchend', e => {
+  if (!hlOn) return;
+  const sel = window.getSelection();
+  if (sel && !sel.isCollapsed) return;               // 글자를 선택하는 중이면 지우지 않는다
+  if (Date.now() - lastPaint < 400) return;          // 방금 칠한 직후의 탭은 무시
+  const t = e.target;
+  const mk = (t && t.closest) ? t.closest('mark.user-hl') : null;
+  if (!mk) return;
+  const z = mk.closest('[data-hl]');
+  const dr = String(mk.dataset.range || '').split('-');
+  if (z && dr.length === 2) dropRange(z.dataset.hl, Number(dr[0]), Number(dr[1]));
+}, {passive: true});
 const hf = document.getElementById('hlfloat');
 if (hf) {
+  /* 안드로이드 태블릿: touchstart 기본동작을 막으면 click 자체가 오지 않는다.
+     → 기본동작은 막아 '선택이 풀리는 것'만 막고, 칠하기는 touchend·click 양쪽에서 한 번만 실행한다. */
   hf.addEventListener('mousedown', e => e.preventDefault());
-  hf.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
-  hf.addEventListener('click', e => { e.preventDefault(); applyHLSelection(); });
+  hf.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); }, {passive: false});
+  hf.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); tryApplyHL(); }, {passive: false});
+  hf.addEventListener('click', e => { e.preventDefault(); tryApplyHL(); });
 }
 let lastPointer = 'mouse';
 document.addEventListener('pointerdown', e => { lastPointer = e.pointerType || 'mouse'; }, true);

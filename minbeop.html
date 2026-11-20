@@ -263,12 +263,12 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 @media (max-width:768px){.syn{font-size:10px;padding:2px 6px;gap:2px}}
 @media (max-width:430px){.syn{padding:2px 5px}.syn.ok .synt{display:none}}
 
-/* ═══ 4대 기능: 📌 핀 마킹 · ⭐ 자동 별표 · ⚠ 내가 고른 오답 · 🔢 숫자 전용 ═══ */
+/* ═══ 3대 기능: 📌 핀 마킹 · ⭐ 자동 별표 · ⚠ 내가 고른 오답 ═══ */
 .b.auto{letter-spacing:1.5px;border:1px solid #e7c96a;background:#fff8e1;color:#a2700a}
 .b.auto.s3{border-color:#e8a49c;background:#fdeeec;color:#a8382f}
 .b.auto.s2{border-color:#eccf92;background:#fffaf0;color:#8a6100}
 
-/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답 / 숫자 전용) ── */
+/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답) ── */
 .selin.moderow{padding-top:0 !important;padding-bottom:7px !important;gap:0 !important}
 .modetabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%}
 .mtab{appearance:none;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:99px;
@@ -280,17 +280,8 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 .mtab.on .cnt{opacity:.88}
 .mtab.viewfp{border-color:#e8c9c4;color:#a8382f;background:#fdf3f1}
 .mtab.viewfp.on{background:#a8382f;border-color:#a8382f;color:#fff}
-.mtab.viewnum{border-color:#c9d6e8;color:#1d4f80;background:#f4f8ff}
-.mtab.viewnum.on{background:#123a63;border-color:#123a63;color:#fff}
 
-/* ── 숫자 가리기: 글자를 지우지 않고 투명 글자 + 회색 상자 ── */
-span.n{color:transparent;background:#e2e8f0;border:1px solid #94a3b8;border-radius:5px;
-  padding:0 4px;min-width:2.2em;display:inline-block;text-align:center;cursor:pointer;
-  user-select:none;-webkit-user-select:none;font-weight:inherit;letter-spacing:0;line-height:1.42}
-span.n:active{background:#cfd8e6}
-span.n.open{color:#B42318;background:#FDE68A;border-color:#E0A800;font-weight:800}
-
-/* ── ⚠ 내가 고른 오답 · 🔢 숫자 전용 공통 목록 ── */
+/* ── ⚠ 내가 고른 오답 공통 목록 ── */
 .card.plain{background:transparent;border:none;box-shadow:none;padding:0}
 .fphead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 2px 12px}
 .fphead .t{font-size:19px;font-weight:800;color:var(--navy)}
@@ -320,16 +311,6 @@ span.n.open{color:#B42318;background:#FDE68A;border-color:#E0A800;font-weight:80
 .wexp .wlab{display:block;color:var(--navy2);font-size:13.5px;font-weight:800;margin-bottom:3px}
 .wfoot{margin-top:18px;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.7}
 
-/* 숫자 전용 카드 */
-.nline{align-items:flex-start;border-color:#e2e8f2;background:#fbfcfe}
-.nline .num{color:#1d4f80;font-size:17px;min-width:1.1em;text-align:center}
-.nline .ox{display:none;flex:0 0 auto;font-size:11.5px;font-weight:900;border-radius:6px;
-  padding:2px 7px;margin-top:3px;border:1px solid}
-.nline .ox.o{background:#eaf7ef;color:#1f6b41;border-color:#bfe3cc}
-.nline .ox.x{background:#fdeeec;color:#a8382f;border-color:#f3c9c4}
-.nline .ox.a{background:#eef2f8;color:#33405a;border-color:#dbe2ee}
-.wcard.reveal .nline .ox{display:inline-block}
-.wcard.reveal .nline.ok{background:#f2faf5;border-color:#bfe3cc}
 .ncore{display:none}
 .wcard.reveal .ncore{display:block}
 .nbtn{appearance:none;margin-left:auto;border:1px solid #cfd6e2;background:#fff;color:#22314c;
@@ -355,12 +336,10 @@ span.n.open{color:#B42318;background:#FDE68A;border-color:#E0A800;font-weight:80
   .wpick{font-size:14px;padding:8px 10px;border-radius:10px;gap:7px}
   .wpick .num{font-size:15px} .wpick .lab{font-size:10.5px;padding:2px 6px}
   .wexp{font-size:13.5px;line-height:1.5}
-  .nline .tx{font-size:14px}
   .nbtn{font-size:11.5px;padding:4px 9px}
-  span.n{min-width:1.9em;padding:0 3px}
 }
 @media (max-width:430px){
-  .modetabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .modetabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
   .mtab{justify-content:center;padding:5px 4px;font-size:11.5px;gap:3px}
   .mtab .ic{display:none}
   .mtab .cnt{font-size:10.5px}
@@ -433,7 +412,7 @@ function load(){
                idx:0, view:'all', type:'all', star:0};
   if (!s || !s.answers) return def;
   const st = {answers:s.answers||{}, graded:s.graded||{}, idx:s.idx||0,
-              view:['all','mark','wrong','fp','num'].indexOf(s.view) >= 0 ? s.view : 'all', type:s.type||'all',
+              view:['all','mark','wrong','fp'].indexOf(s.view) >= 0 ? s.view : 'all', type:s.type||'all',
               star:[0,1,2,3].indexOf(s.star) >= 0 ? s.star : 0,
               part:s.part || s.law || s.major || '전체'};
   const u = (typeof s.unit === 'string') ? s.unit : '';
@@ -580,6 +559,8 @@ let hlOn = !!readJSON(LS + '_hlon', false);
 let HLS = readJSON(LSH, {});
 if (!HLS || typeof HLS !== 'object' || Array.isArray(HLS)) HLS = {};
 let lastPaint = 0;
+let lastValidHL = null;              // 마지막으로 유효했던 선택 범위(터치에서 선택이 풀려도 남겨 둔다)
+let lastApplyTs = 0;                 // touchend·click 중복 실행 방지
 
 function hlStore(id){
   const s = HLS[id];
@@ -720,6 +701,7 @@ function updateFloat(){
   if (!hlOn) { hideFloat(); return; }
   const hit = hlSelection();
   if (!hit) { hideFloat(); return; }
+  lastValidHL = hit;                                 // 선택이 풀리기 전에 범위를 기억해 둔다
   const sel = window.getSelection();
   const rect = sel.getRangeAt(0).getBoundingClientRect();
   f.classList.add('show');
@@ -732,13 +714,24 @@ function updateFloat(){
   f.style.top = top + 'px';
 }
 function applyHLSelection(){
-  const hit = hlSelection();
+  const hit = hlSelection() || lastValidHL;          // 터치에서 선택이 풀렸으면 마지막 유효 선택을 쓴다
   if (!hit) return false;
-  addRange(hit.key, hit.start, hit.end);
+  lastValidHL = null;
   const sel = window.getSelection();
-  if (sel) sel.removeAllRanges();
+  if (sel) sel.removeAllRanges();                    // DOM을 바꾸기 전에 선택부터 풀어야 끊기지 않는다
+  addRange(hit.key, hit.start, hit.end);
   hideFloat();
   return true;
+}
+/* 🖍️ 칠하기 버튼 처리 — touchend 와 click 이 겹쳐도 한 번만 실행한다 */
+function tryApplyHL(){
+  const hit = hlSelection() || lastValidHL;
+  if (!hit) return false;
+  if (!document.querySelector('#card [data-hl="' + hit.key + '"]')) { lastValidHL = null; return false; }
+  const now = Date.now();
+  if (now - lastApplyTs < 400) return false;
+  lastApplyTs = now;
+  return applyHLSelection();
 }
 function onCardClick(e){
   if (!hlOn) return;
@@ -775,20 +768,18 @@ function matchView(q){
     return !state.star || Math.min(3, m) === state.star;
   }
   if (state.view === 'fp') return !!firstPick[q.id];      // 내가 고른 오답
-  if (state.view === 'num') return numRows(q).length > 0; // 핵심 숫자가 든 지문이 있는 문항
   return true;
 }
 function counts(){
-  let mark = 0, wrong = 0, fp = 0, num = 0, s1 = 0, s2 = 0, s3 = 0;
+  let mark = 0, wrong = 0, fp = 0, s1 = 0, s2 = 0, s3 = 0;
   DATA.forEach(q => {
     if (!matchBase(q)) return;
     if (marks[q.id]) mark++;
     const m = mistakes[q.id] || 0;
     if (m > 0) { wrong++; const lv = Math.min(3, m); if (lv === 1) s1++; else if (lv === 2) s2++; else s3++; }
     if (firstPick[q.id]) fp++;
-    if (numRows(q).length) num++;
   });
-  return {mark, wrong, fp, num, s1, s2, s3};
+  return {mark, wrong, fp, s1, s2, s3};
 }
 function buildSelectors(){
   const sl = document.getElementById('selPart');
@@ -834,8 +825,7 @@ function buildSelectors(){
     sv.innerHTML = `<option value="all">전체 문제 (${DATA.filter(matchBase).length})</option>` +
       `<option value="mark">📌 핀 마킹한 문제 (${c.mark})</option>` +
       `<option value="wrong">✗ 틀린 문제 (${c.wrong})</option>` +
-      `<option value="fp">⚠ 내가 고른 오답 (${c.fp})</option>` +
-      `<option value="num">🔢 숫자 전용 (${c.num})</option>`;
+      `<option value="fp">⚠ 내가 고른 오답 (${c.fp})</option>`;
     sv.value = state.view || 'all';
     sv.onchange = () => { state.view = sv.value; state.idx = 0; rebuild(); };
   }
@@ -850,24 +840,22 @@ function rebuild(){
   cur = Math.min(state.idx || 0, Math.max(0, list.length - 1));
   state.idx = cur;
   if (state.view === 'fp') renderWrongList();
-  else if (state.view === 'num') renderNumList();
   else render();
   renderGrid(); renderScore();
 }
 
-/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답 / 숫자 전용) ── */
+/* ── 상단 보기 탭 (전체 / 핀 마킹 / 틀린 문제 / 내가 고른 오답) ── */
 const VIEWS = [
   {v:'all',   ic:'📚', lb:'전체',          cls:''},
   {v:'mark',  ic:'📌', lb:'핀 마킹',        cls:''},
   {v:'wrong', ic:'✗',  lb:'틀린 문제',      cls:''},
-  {v:'fp',    ic:'⚠',  lb:'내가 고른 오답', cls:'viewfp '},
-  {v:'num',   ic:'🔢', lb:'숫자 전용',      cls:'viewnum '}
+  {v:'fp',    ic:'⚠',  lb:'내가 고른 오답', cls:'viewfp '}
 ];
 function renderModeTabs(){
   const box = document.getElementById('modeTabs');
   if (!box) return;
   const c = counts();
-  const num = {all: DATA.filter(matchBase).length, mark: c.mark, wrong: c.wrong, fp: c.fp, num: c.num};
+  const num = {all: DATA.filter(matchBase).length, mark: c.mark, wrong: c.wrong, fp: c.fp};
   box.innerHTML = VIEWS.map(o =>
     `<button type="button" class="mtab ${o.cls}${state.view === o.v ? 'on' : ''}" data-view="${o.v}">` +
     `<span class="ic">${o.ic}</span><span class="lb">${o.lb}</span><span class="cnt">${num[o.v]}</span></button>`).join('');
@@ -953,142 +941,6 @@ function focusQuestion(id){
   rebuild();
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
-
-/* ── 🔢 숫자 전용: 핵심 숫자가 들어 있는 지문만 ──────────────────────────
-   기간·비율·면적·금액 같은 함정 숫자만 '핵심 숫자'로 본다.
-   조문번호(제12조)·회차(제29회)·항목번호(1))·단위 없는 한 자리 숫자는 세지 않는다. */
-const NUM_UNIT = '제곱미터|평방미터|킬로미터|퍼센트|개월|시간|세대|만원|미터|㎡|평|년|월|일|회|층|호|명|km|cm|mm|%|배|원|억|만|천|점|개|곳|대|종|도|주|초|분|톤|kg|리터|ℓ';
-const NUM_RE = new RegExp('(\\d[\\d,.]*(?:\\s*분의\\s*\\d[\\d,.]*)?)(\\s*)(' + NUM_UNIT + ')?', 'g');
-const NUMCACHE = {};
-function numSpans(t){
-  const out = [];
-  if (!t) return out;
-  const re = new RegExp(NUM_RE.source, 'g');
-  let m;
-  while ((m = re.exec(t))) {
-    const tok = m[0].replace(/\s+$/, ''), start = m.index, unit = m[3] || '';
-    const digits = m[1].replace(/[^0-9]/g, '');
-    const prev = start > 0 ? t.charAt(start - 1) : '';
-    const next = t.charAt(start + tok.length);
-    if (!digits) continue;
-    if (prev === '제') continue;                       // 제12조 · 제29회
-    if (!unit && /[조항목]/.test(next)) continue;       // 12조 · 1항
-    if (/[.,]\s*$/.test(m[0])) continue;                // 날짜·목록 구분자(2020. 3. 2.)
-    if (/^[.,)]/.test(next)) continue;                  // 1) 항목번호
-    if (!unit && next === '번') continue;               // 1번
-    if (!unit && digits.length < 2) continue;           // 단위 없는 한 자리
-    out.push({s: start, e: start + tok.length, tx: tok});
-  }
-  return out;
-}
-function hasKeyNum(t){ return numSpans(t).length > 0; }
-/* 그 문항에서 '숫자가 든 지문'만 골라낸다(선지 → 없으면 단답 답안) */
-function numRows(q){
-  if (!q) return [];
-  if (NUMCACHE[q.id]) return NUMCACHE[q.id];
-  const out = [];
-  (q.choices || []).forEach(c => {
-    if (c.text && hasKeyNum(c.text))
-      out.push({n: c.n, tx: c.text, mk: c.mark || (c.ans ? 'O' : 'X'), ans: !!c.ans});
-  });
-  if (!out.length && (q.blanks || []).length) {
-    q.blanks.forEach((b, i) => {
-      if (b && hasKeyNum(b))
-        out.push({n: q.blanks.length > 1 ? '빈칸' + (i + 1) : '답', tx: b, mk: '정답', ans: true});
-    });
-  }
-  if (!out.length) {                       // 선지에 숫자가 없으면 해설 핵심 문장에서
-    [q.core].concat(q.paras || []).forEach(p => {
-      if (p && hasKeyNum(p)) out.push({n: '해설', tx: p, mk: '', ans: false});
-    });
-  }
-  NUMCACHE[q.id] = out;
-  return out;
-}
-function renderNumList(){
-  const card = document.getElementById('card');
-  card.classList.add('plain');
-  let rows = 0;
-  list.forEach(q => { rows += numRows(q).length; });
-  if (!list.length) {
-    card.innerHTML = `<div class="empty">핵심 숫자가 들어 있는 문제가 없습니다.<br>위의 단원·유형 조건을 바꿔 보세요.</div>`;
-  } else {
-    card.innerHTML =
-      `<div class="fphead"><span class="t">🔢 숫자 전용</span>` +
-      `<span class="d">핵심 숫자(기간·비율·면적·금액)가 든 지문만 모았습니다 · ${list.length}문항 ${rows}지문</span></div>` +
-      `<div class="wrongwrap">` + list.map(numCard).join('') + `</div>` +
-      `<div class="wfoot">회색 상자를 누르면 숫자가 열립니다 · 각 문항의 ‘정답 보기’로 O·X와 해설을 확인하세요.</div>`;
-    applyNumMask(card);
-    card.querySelectorAll('.nbtn').forEach(b => {
-      b.onclick = () => {
-        const wc = b.closest('.wcard');
-        const on = wc.classList.toggle('reveal');
-        b.classList.toggle('on', on);
-        b.textContent = on ? '정답 숨기기' : '정답 보기';
-      };
-    });
-  }
-  updateProgress();
-}
-function numCard(q){
-  const lv = starLv(q.id);
-  const rs = numRows(q);
-  const stemHas = hasKeyNum(q.stem || '');
-  const rows = rs.map((r, i) =>
-    `<div class="wpick nline${r.ans ? ' ok' : ''}"><span class="num">${esc(r.n)}</span>` +
-    `<span class="tx hlz" data-n="${i}">${esc(r.tx)}</span>` +
-    (r.mk ? `<span class="ox ${r.mk === 'O' ? 'o' : (r.mk === 'X' ? 'x' : 'a')}">${esc(r.mk)}</span>` : '') +
-    `</div>`).join('');
-  return `<div class="wcard">
-    <div class="wtop">
-      <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
-      ${lv ? `<span class="b auto s${lv}" title="자동 별표 — 틀린 횟수만큼">${'★'.repeat(lv)}</span>` : ''}
-      <span class="wunit">${esc(q.unit || q.part || '')}</span>
-      <button type="button" class="nbtn">정답 보기</button>
-    </div>
-    <div class="wstem ctx hlz">${esc(q.stem)}</div>
-    <div class="wpicks">${rows}</div>
-    ${q.core ? `<div class="wexp ncore"><div class="wlab">해설</div><span class="hlz">${esc(q.core)}</span></div>` : ''}
-  </div>`;
-}
-/* 숫자를 회색 상자로 덮는다 — 이 화면(🔢 숫자 전용)에서만 쓴다 */
-const MASK_SKIP = 'span.n,mark.user-hl,.b,.mtab,#progtxt,.num,.wtop,.nbtn,.ox,.wlab,.wfoot,.fphead';
-function maskOneNode(node){
-  const t = node.nodeValue;
-  const hits = numSpans(t);
-  if (!hits.length) return;
-  const frag = document.createDocumentFragment();
-  let pos = 0;
-  hits.forEach(h => {
-    if (h.s > pos) frag.appendChild(document.createTextNode(t.slice(pos, h.s)));
-    const b = document.createElement('span');
-    b.className = 'n'; b.textContent = h.tx;
-    frag.appendChild(b);
-    pos = h.e;
-  });
-  if (pos < t.length) frag.appendChild(document.createTextNode(t.slice(pos)));
-  node.parentNode.replaceChild(frag, node);
-}
-function applyNumMask(root){
-  if (!root) return;
-  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-  const nodes = []; let nd;
-  while ((nd = w.nextNode())) {
-    const p = nd.parentElement;
-    if (!p || p.closest(MASK_SKIP)) continue;
-    if (!nd.nodeValue || !/\d/.test(nd.nodeValue)) continue;
-    nodes.push(nd);
-  }
-  nodes.forEach(maskOneNode);
-}
-/* 회색 상자를 누르면 그 숫자만 보인다 */
-document.addEventListener('click', e => {
-  const b = e.target && e.target.closest ? e.target.closest('span.n') : null;
-  if (!b) return;
-  e.preventDefault(); e.stopPropagation();
-  b.classList.toggle('open');
-}, true);
-
 /* ── 렌더 ─────────────────────────────────────────────────────────── */
 function diffBadge(q){
   const map = {'상':['d-sang','난이도 상 · 버려도 되는 문제'], '중':['d-jung','난이도 중 · 공부해서 풀 문제'], '하':['d-ha','난이도 하 · 무조건 맞출 문제']};
@@ -1111,6 +963,7 @@ function rdText(n, qr){
   return `<span class="rd">(${n.art ? n.art + ' · ' : ''}${rtxt})</span>`;
 }
 function render(){
+  lastValidHL = null;                                // 화면이 바뀌면 이전 선택 범위는 버린다
   const card = document.getElementById('card');
   card.classList.remove('plain');
   const q = list[cur];
@@ -1372,7 +1225,7 @@ function jumpUnit(dir){
   return false;
 }
 function go(d){
-  if (state.view === 'fp' || state.view === 'num') return;   // 목록 화면에서는 문항 이동 없음
+  if (state.view === 'fp') return;   // 목록 화면에서는 문항 이동 없음
   const n = cur + d;
   if (n >= 0 && n < list.length) {
     cur = n; state.idx = n; save(); render();
@@ -1384,8 +1237,8 @@ function go(d){
 }
 function updateProgress(){
   const txt = document.getElementById('progtxt'), fill = document.getElementById('progfill');
-  if (state.view === 'fp' || state.view === 'num') {
-    txt.textContent = (state.view === 'fp' ? '⚠ 내가 고른 오답 ' : '🔢 숫자 전용 ') + list.length + '문항';
+  if (state.view === 'fp') {
+    txt.textContent = '⚠ 내가 고른 오답 ' + list.length + '문항';
     fill.style.width = '100%';
     return;
   }
@@ -1411,13 +1264,13 @@ function renderGrid(){
   g.querySelectorAll('.gi').forEach(el => {
     el.onclick = () => {
       const qi = +el.dataset.i;
-      if (state.view === 'fp' || state.view === 'num') { closeDrawer(); focusQuestion((list[qi] || {}).id); return; }
+      if (state.view === 'fp') { closeDrawer(); focusQuestion((list[qi] || {}).id); return; }
       cur = qi; state.idx = cur; save(); render(); renderGrid(); closeDrawer();
     };
   });
 }
 function renderScore(){
-  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, fpQ = 0, numQ = 0;
+  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, fpQ = 0;
   DATA.forEach(q => {
     if (!matchBase(q)) return;                 // 상단에서 고른 PART·단원 기준
     const v = state.graded[q.id];
@@ -1426,12 +1279,11 @@ function renderScore(){
     if (m > 0) { wrongQ++; totWrong += m; }
     if (marks[q.id]) marked++;
     if (firstPick[q.id]) fpQ++;
-    if (numRows(q).length) numQ++;
   });
   document.getElementById('score').innerHTML =
     `확인 <b>${done}</b>문항 · 맞음 <b>${right}</b>` + (done ? ` · 정답률 <b>${Math.round(right / done * 100)}%</b>` : '') +
     `<br>📌 핀 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회)` +
-    `<br>⚠ 내가 고른 오답 <b>${fpQ}</b>개 · 🔢 숫자 문항 <b>${numQ}</b>개`;
+    `<br>⚠ 내가 고른 오답 <b>${fpQ}</b>개`;
   const sc = document.getElementById('sideCount');
   if (sc) sc.textContent = `${list.length}문항`;
   renderDaily();
@@ -1456,11 +1308,27 @@ document.getElementById('btnList').onclick = () => {
 document.getElementById('btnClose').onclick = closeDrawer;
 
 document.getElementById('card').addEventListener('click', onCardClick);
+/* 터치에서는 click 이 오지 않는 경우가 있어, 칠해 둔 형광펜 탭 지우기를 touchend 에서도 받는다 */
+document.getElementById('card').addEventListener('touchend', e => {
+  if (!hlOn) return;
+  const sel = window.getSelection();
+  if (sel && !sel.isCollapsed) return;               // 글자를 선택하는 중이면 지우지 않는다
+  if (Date.now() - lastPaint < 400) return;          // 방금 칠한 직후의 탭은 무시
+  const t = e.target;
+  const mk = (t && t.closest) ? t.closest('mark.user-hl') : null;
+  if (!mk) return;
+  const z = mk.closest('[data-hl]');
+  const dr = String(mk.dataset.range || '').split('-');
+  if (z && dr.length === 2) dropRange(z.dataset.hl, Number(dr[0]), Number(dr[1]));
+}, {passive: true});
 const hf = document.getElementById('hlfloat');
 if (hf) {
+  /* 안드로이드 태블릿: touchstart 기본동작을 막으면 click 자체가 오지 않는다.
+     → 기본동작은 막아 '선택이 풀리는 것'만 막고, 칠하기는 touchend·click 양쪽에서 한 번만 실행한다. */
   hf.addEventListener('mousedown', e => e.preventDefault());
-  hf.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
-  hf.addEventListener('click', e => { e.preventDefault(); applyHLSelection(); });
+  hf.addEventListener('touchstart', e => { if (e.cancelable) e.preventDefault(); }, {passive: false});
+  hf.addEventListener('touchend', e => { if (e.cancelable) e.preventDefault(); tryApplyHL(); }, {passive: false});
+  hf.addEventListener('click', e => { e.preventDefault(); tryApplyHL(); });
 }
 let lastPointer = 'mouse';
 document.addEventListener('pointerdown', e => { lastPointer = e.pointerType || 'mouse'; }, true);
