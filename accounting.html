@@ -119,7 +119,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 .note .mk{flex:0 0 auto;font-weight:900;font-size:17px;width:20px;text-align:center}
 .note .mk.O{color:var(--green)} .note .mk.X{color:var(--red)}
 .note .tx{flex:1;min-width:0}
-.note .rd{color:#7b8798;font-size:15px;font-weight:700;white-space:nowrap;margin-left:4px}
+.note .rd{color:#7b8798;font-size:15px;font-weight:700;white-space:normal;margin-left:4px}
 .cites{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
 .cites .lab{font-size:14px;font-weight:800;color:var(--muted)}
 .chip{display:inline-block;border:1px solid #d7dfea;background:#f2f5fa;border-radius:8px;padding:5px 10px;
@@ -255,10 +255,12 @@ function load(){
   const s = readJSON(LS, null);
   const def = {answers:{}, graded:{}, part:'전체', unit:'전체 단원', sub:'전체 세부',
                idx:0, view:'all', type:'all'};
-  if (!s || !s.answers) return def;
+  if (!s || typeof s !== 'object') return def;
   const st = {answers:s.answers||{}, graded:s.graded||{}, idx:s.idx||0,
               view:s.view||'all', type:s.type||'all',
               part:s.part || s.law || s.major || '전체'};
+  /* 개인용 회계 페이지(my-accounting)와 저장소를 함께 쓰므로 '말문제/계산문제' 선택도 잃지 않게 넘긴다 */
+  if (s.kind) st.kind = s.kind;
   const u = (typeof s.unit === 'string') ? s.unit : '';
   if (u && u !== '__all' && u.indexOf('|') > 0) {
     st.unit = u.split('|')[0];
@@ -561,13 +563,13 @@ function buildSelectors(){
       ss.style.display = 'none';
       state.sub = '전체 세부';
     }
-    ss.onchange = () => { state.sub = ss.value; state.idx = 0; buildSelectors(); rebuild(); };
+    ss.onchange = () => { state.sub = ss.value; state.idx = 0; save(); buildSelectors(); rebuild(); };
   }
 
   const st = document.getElementById('selType');
   if (st && HAS_SHORT) {
     st.value = state.type || 'all';
-    st.onchange = () => { state.type = st.value; state.idx = 0; buildSelectors(); rebuild(); };
+    st.onchange = () => { state.type = st.value; state.idx = 0; save(); buildSelectors(); rebuild(); };
   }
 
   const sv = document.getElementById('selView');
@@ -577,11 +579,11 @@ function buildSelectors(){
       `<option value="mark">★ 마킹한 문제 (${c.mark})</option>` +
       `<option value="wrong">✗ 틀린 문제 (${c.wrong})</option>`;
     sv.value = state.view || 'all';
-    sv.onchange = () => { state.view = sv.value; state.idx = 0; rebuild(); };
+    sv.onchange = () => { state.view = sv.value; state.idx = 0; save(); rebuild(); };
   }
 
-  sl.onchange = () => { state.part = sl.value; state.unit = '전체 단원'; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
-  su.onchange = () => { state.unit = su.value; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
+  sl.onchange = () => { state.part = sl.value; state.unit = '전체 단원'; state.sub = '전체 세부'; state.idx = 0; save(); buildSelectors(); rebuild(); };
+  su.onchange = () => { state.unit = su.value; state.sub = '전체 세부'; state.idx = 0; save(); buildSelectors(); rebuild(); };
 }
 
 function rebuild(){
@@ -603,7 +605,7 @@ function tblHtml(rows){
     '<tr>' + r.map(c => `<${i === 0 ? 'th' : 'td'}>${esc(c)}</${i === 0 ? 'th' : 'td'}>`).join('') + '</tr>').join('') + '</table></div>';
 }
 function rdText(n){
-  const rtxt = (n.rnd && n.rnd.length) ? n.rnd.filter(r => r).map(r => r + '회').join('·') : '';
+  const rtxt = (n.rnd && n.rnd.length) ? n.rnd.filter((r, i, a) => r && a.indexOf(r) === i).sort((a, b) => a - b).map(r => r + '회').join(', ') : '';
   if (!rtxt) return '';
   return `<span class="rd">(${n.art ? n.art + ' · ' : ''}${rtxt})</span>`;
 }
@@ -901,6 +903,13 @@ document.body.classList.toggle('hlmode', hlOn);
 
 buildSelectors();
 rebuild();
+
+/* 상단 카테고리 선택값은 바뀔 때 즉시 저장되지만,
+   폰·태블릿에서 화면을 벗어나거나 앱이 페이지를 접을 때도 한 번 더 남긴다. */
+function saveSelectors(){ try { save(); } catch(e){} }
+document.addEventListener('visibilitychange', function(){ if (document.hidden) saveSelectors(); });
+window.addEventListener('pagehide', saveSelectors);
+
 </script>
 </body>
 </html>

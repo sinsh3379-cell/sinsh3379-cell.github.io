@@ -121,7 +121,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
 .note .mk{flex:0 0 auto;font-weight:900;font-size:17px;width:20px;text-align:center}
 .note .mk.O{color:var(--green)} .note .mk.X{color:var(--red)}
 .note .tx{flex:1;min-width:0}
-.note .rd{color:#7b8798;font-size:15px;font-weight:700;white-space:nowrap;margin-left:4px}
+.note .rd{color:#7b8798;font-size:15px;font-weight:700;white-space:normal;margin-left:4px}
 .cites{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
 .cites .lab{font-size:14px;font-weight:800;color:var(--muted)}
 .chip{display:inline-block;border:1px solid #d7dfea;background:#f2f5fa;border-radius:8px;padding:5px 10px;
@@ -437,7 +437,7 @@ function load(){
   const s = readJSON(LS, null);
   const def = {answers:{}, graded:{}, part:'전체', unit:'전체 단원', sub:'전체 세부',
                idx:0, view:'all', type:'all', star:0};
-  if (!s || !s.answers) return def;
+  if (!s || typeof s !== 'object') return def;
   const st = {answers:s.answers||{}, graded:s.graded||{}, idx:s.idx||0,
               view:['all','mark','wrong','fp','num'].indexOf(s.view) >= 0 ? s.view : 'all', type:s.type||'all',
               star:[0,1,2,3].indexOf(s.star) >= 0 ? s.star : 0,
@@ -839,13 +839,13 @@ function buildSelectors(){
       ss.style.display = 'none';
       state.sub = '전체 세부';
     }
-    ss.onchange = () => { state.sub = ss.value; state.idx = 0; buildSelectors(); rebuild(); };
+    ss.onchange = () => { state.sub = ss.value; state.idx = 0; save(); buildSelectors(); rebuild(); };
   }
 
   const st = document.getElementById('selType');
   if (st && HAS_SHORT) {
     st.value = state.type || 'all';
-    st.onchange = () => { state.type = st.value; state.idx = 0; buildSelectors(); rebuild(); };
+    st.onchange = () => { state.type = st.value; state.idx = 0; save(); buildSelectors(); rebuild(); };
   }
 
   const sv = document.getElementById('selView');
@@ -857,12 +857,12 @@ function buildSelectors(){
       `<option value="fp">⚠ 내가 고른 오답 (${c.fp})</option>` +
       `<option value="num">🔢 숫자 전용 (${c.num})</option>`;
     sv.value = state.view || 'all';
-    sv.onchange = () => { state.view = sv.value; state.idx = 0; rebuild(); };
+    sv.onchange = () => { state.view = sv.value; state.idx = 0; save(); rebuild(); };
   }
   renderModeTabs();
 
-  sl.onchange = () => { state.part = sl.value; state.unit = '전체 단원'; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
-  su.onchange = () => { state.unit = su.value; state.sub = '전체 세부'; state.idx = 0; buildSelectors(); rebuild(); };
+  sl.onchange = () => { state.part = sl.value; state.unit = '전체 단원'; state.sub = '전체 세부'; state.idx = 0; save(); buildSelectors(); rebuild(); };
+  su.onchange = () => { state.unit = su.value; state.sub = '전체 세부'; state.idx = 0; save(); buildSelectors(); rebuild(); };
 }
 
 function rebuild(){
@@ -1127,7 +1127,7 @@ function rdText(n, qr){
   if (Number.isInteger(qn) && qn >= 19) rs.push(qn);
   rs = rs.filter((v, i) => rs.indexOf(v) === i).sort((a, b) => a - b);
   if (!rs.length) return '';
-  const rtxt = rs.length <= 2 ? rs.map(r => r + '회').join('·') : rs[0] + '회 외 ' + (rs.length - 1) + '회';
+  const rtxt = rs.map(r => r + '회').join(', ');
   return `<span class="rd">(${n.art ? n.art + ' · ' : ''}${rtxt})</span>`;
 }
 function render(){
@@ -1527,6 +1527,13 @@ document.body.classList.toggle('hlmode', hlOn);
 })();
 buildSelectors();
 rebuild();
+
+/* 상단 카테고리 선택값은 바뀔 때 즉시 저장되지만,
+   폰·태블릿에서 화면을 벗어나거나 앱이 페이지를 접을 때도 한 번 더 남긴다. */
+function saveSelectors(){ try { save(); } catch(e){} }
+document.addEventListener('visibilitychange', function(){ if (document.hidden) saveSelectors(); });
+window.addEventListener('pagehide', saveSelectors);
+
 
 /* ── ☁️ 기기 간 자동 동기화 (회사 태블릿 · 집 태블릿 · 스마트폰) ─────────────
    무로그인 공용 JSON 저장소(MantleDB)에 이 과목의 풀이 기록을 올리고,
