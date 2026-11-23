@@ -51,6 +51,8 @@ select{appearance:none;border:1px solid #cfd6e2;background:#fff;border-radius:10
 .b.d-jung{color:var(--jung);background:#fff6dd;border-color:#ecd9a3}
 .b.d-ha{color:var(--ha);background:#eaf7ef;border-color:#bfe3cc}
 .b.miss{color:var(--red);background:#fdeeec;border-color:#f0c8c3}
+.b.streak{color:#8a5a00;background:#fff6dd;border-color:#ecd9a3}
+.b.grad{color:#1f7a48;background:#eaf7ef;border-color:#bfe3cc}
 .star{margin-left:auto;appearance:none;border:1px solid #e2d2a4;background:#fffdf5;color:#c9a227;
   width:48px;height:44px;border-radius:12px;font-size:22px;line-height:1;cursor:pointer}
 .star.on{background:var(--goldbg);border-color:#e0bd52;color:#d29b00}
@@ -442,6 +444,47 @@ mistakes = readJSON(LSM, {}) || {};
 marks = readJSON(LSK, {}) || {};
 if (typeof marks !== 'object' || marks === null) marks = {};
 
+/* ── 🎓 오답 자동 졸업 — 연속 2번 맞히면 오답 목록에서 빠진다 ──────────────────
+   · 틀리면 누적 오답 횟수(mistakes)가 1 늘고 연속 정답은 0/2로 돌아간다.
+   · 오답 목록에 남은 문제를 맞히면 1/2, 한 번 더 맞히면 2/2로 졸업(목록에서 제외)한다.
+   · 졸업해도 누적 오답 횟수·⭐ 별표·📌 핀은 건드리지 않는다 — 별표와 완전히 분리.
+   · 이 기능 전에 쌓인 옛 오답은 연속 정답 정보가 없으므로 '0/2 진행 중'으로 본다. */
+const LSW = LS + '_wrong2';
+let wrong2 = readJSON(LSW, {}) || {};
+if (typeof wrong2 !== 'object' || wrong2 === null || Array.isArray(wrong2)) wrong2 = {};
+(function normW2(){
+  const out = {};
+  Object.keys(wrong2).forEach(k => {
+    const e = wrong2[k];
+    if (!e) return;
+    const s = Array.isArray(e) ? e[0] : e.s;
+    const g = Array.isArray(e) ? e[1] : e.g;
+    const t = Array.isArray(e) ? e[2] : e.t;
+    if (!s && !g && !t) return;
+    out[k] = {s: Math.max(0, Math.min(2, s | 0)), g: g ? 1 : 0, t: t | 0};
+  });
+  wrong2 = out;
+})();
+function w2(id){
+  const e = wrong2[id];
+  return (e && typeof e === 'object' && !Array.isArray(e)) ? e : {s: 0, g: 0, t: 0};
+}
+/* 오답 목록에 남아 있는 문제인가 — 2번 연속 맞혀 졸업한 문제는 빠진다 */
+function isWrongActive(id){ return (mistakes[id] || 0) > 0 && !w2(id).g; }
+function setW2(id, s, g){
+  wrong2[id] = {s: Math.max(0, Math.min(2, s | 0)), g: g ? 1 : 0, t: Date.now()};
+  writeJSON(LSW, wrong2);
+  return wrong2[id];
+}
+/* 맞힘 — 오답 목록에 있는 문제만 센다. 2/2가 되면 졸업(오답 목록에서 제외) */
+function markRight(id){
+  if ((mistakes[id] || 0) <= 0) return null;      /* 한 번도 틀린 적 없는 문제는 그대로 */
+  const cur = w2(id);
+  if (cur.g) return null;                          /* 이미 졸업한 문제는 그대로 */
+  const s = Math.min(2, (cur.s | 0) + 1);
+  return setW2(id, s, s >= 2);
+}
+
 /* 📌 핀 마킹 · ⭐ 자동 별표 · ⚠ 처음 고른 오답 ─── 4대 기능 ─── */
 const LSF = LS + '_firstpick';                      // 처음 틀렸을 때 고른 선지
 let firstPick = readJSON(LSF, {}) || {};
@@ -507,6 +550,7 @@ function starLv(id){ return Math.min(3, mistakes[id] || 0); }
 function markWrong(id, pick, shortAns){
   mistakes[id] = (mistakes[id] || 0) + 1;
   writeJSON(LSM, mistakes);
+  setW2(id, 0, 0);                       /* 다시 틀리면 연속 정답은 0/2로 리셋 */
   if (!firstPick[id]) {
     var sAns = shortAns == null ? '' : String(shortAns);
     if (pick || sAns) {
@@ -763,8 +807,8 @@ function baseFilter(q){
 function matchView(q){
   if (state.view === 'mark') return !!marks[q.id];
   if (state.view === 'wrong') {
+    if (!isWrongActive(q.id)) return false;         /* 🎓 두 번 연속 맞힌 문제는 오답 목록에서 빠진다 */
     const m = mistakes[q.id] || 0;
-    if (m <= 0) return false;
     return !state.star || Math.min(3, m) === state.star;
   }
   if (state.view === 'fp') return !!firstPick[q.id];      // 내가 고른 오답
@@ -776,7 +820,7 @@ function counts(){
     if (!matchBase(q)) return;
     if (marks[q.id]) mark++;
     const m = mistakes[q.id] || 0;
-    if (m > 0) { wrong++; const lv = Math.min(3, m); if (lv === 1) s1++; else if (lv === 2) s2++; else s3++; }
+    if (m > 0 && !w2(q.id).g) { wrong++; const lv = Math.min(3, m); if (lv === 1) s1++; else if (lv === 2) s2++; else s3++; }
     if (firstPick[q.id]) fp++;
   });
   return {mark, wrong, fp, s1, s2, s3};
@@ -917,7 +961,7 @@ function wrongCard(q){
       <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
       ${lv ? `<span class="b auto s${lv}" title="자동 별표 — 틀린 횟수만큼">${'★'.repeat(lv)}</span>` : ''}
       <span class="wunit">${esc(q.unit || q.part || '')}</span>
-      <span class="wcount">오답 ${mistakes[q.id] || 0}회</span>
+      <span class="wcount">❌ ${mistakes[q.id] || 0}회${(mistakes[q.id] || 0) > 0 ? (w2(q.id).g ? ' · 🎓 졸업' : ` · ${w2(q.id).s}/2`) : ''}</span>
     </div>
     <div class="wstem hlz">${esc(q.stem)}</div>
     <div class="wpicks">
@@ -976,6 +1020,7 @@ function render(){
   const picked = state.answers[q.id];
   const graded = state.graded[q.id];
   const stored = mistakes[q.id] || 0;
+  const wcur = w2(q.id);
   const isM = !!marks[q.id];
 
   let intro = (q.intro || []).map(t => `<div class="intro hlz" data-hl="intro-${(Math.random()*1e6)|0}">${esc(t)}</div>`).join('');
@@ -1025,7 +1070,8 @@ function render(){
   if (q.noAns && graded === null) {
     result = `<div class="result warn">이 문항은 현행 기준으로 정답이 없습니다.${stored ? '' : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   } else if (graded === true) {
-    result = `<div class="result ok">정답입니다.${ansLine ? ` (${esc(ansLine)})` : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
+    const gline = stored > 0 ? (wcur.g ? ' 🎓 오답 졸업 완료.' : ` 오답 연속 정답 ${wcur.s}/2${wcur.s < 2 ? ' — 한 번 더 맞히면 졸업합니다.' : ''}`) : '';
+    result = `<div class="result ok">정답입니다.${gline}${ansLine ? ` (${esc(ansLine)})` : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   } else if (graded === false) {
     result = `<div class="result no">틀렸습니다. (정답 ${esc(ansLine)})<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   }
@@ -1071,7 +1117,9 @@ function render(){
         <div class="qmeta">
           <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
           ${diffBadge(q)}
-          ${stored ? `<span class="b miss">누적 오답 ${stored}회</span>` : ''}
+          ${stored ? `<span class="b miss" title="누적 오답 ${stored}회">❌ ${stored}회</span>` : ''}
+          ${stored && !wcur.g ? `<span class="b streak" title="오답 연속 정답 ${wcur.s}/2 — 한 번 더 맞히면 오답에서 졸업합니다">${wcur.s}/2</span>` : ''}
+          ${stored && wcur.g ? `<span class="b grad" title="오답에서 졸업했습니다 — 누적 오답 기록·⭐ 별표는 그대로 남습니다">🎓 오답 졸업</span>` : ''}
           ${starLv(q.id) ? `<span class="b auto s${starLv(q.id)}" title="자동 별표 — 틀린 횟수만큼 붙습니다(최대 3개)">${'★'.repeat(starLv(q.id))}</span>` : ''}
         </div>
         <div class="stem hlz" data-hl="stem">${q.stemBr ? esc(q.stem).replace(/○/g, '<br>○') : esc(q.stem)}</div>
@@ -1104,9 +1152,11 @@ function render(){
       }
       state.graded[q.id] = !!c.ans;
       const lv = c.ans ? 0 : markWrong(q.id, n);
+      const grad = c.ans ? markRight(q.id) : null;
       save(); markDaily(q.id, !!c.ans);
       render(); renderGrid(); renderScore(); buildSelectors();
       if (lv) toast('틀렸습니다 — 자동 별표 ' + '★'.repeat(lv) + '  (오답 ' + mistakes[q.id] + '회)', 2200);
+      else if (grad) toast(grad.g ? '🎓 오답 졸업 — 2번 연속 정답(2/2). 오답 목록에서 빠졌습니다.' : '✅ 1/2 — 한 번 더 맞히면 오답에서 졸업합니다.', 2600);
     };
   });
 
@@ -1183,8 +1233,10 @@ function gradeShort(){
   });
   state.graded[q.id] = ok;
   if (!ok) markWrong(q.id, null, vals.join(' / '));
+  const grad = ok ? markRight(q.id) : null;
   save(); markDaily(q.id, ok);
   render(); renderGrid(); renderScore(); buildSelectors();
+  if (grad) toast(grad.g ? '🎓 오답 졸업 — 2번 연속 정답(2/2). 오답 목록에서 빠졌습니다.' : '✅ 1/2 — 한 번 더 맞히면 오답에서 졸업합니다.', 2600);
 }
 
 /* 전체 PART의 단원을 PART 순서대로 이어 붙인 목록 — PART 경계를 넘어 이동한다 */
@@ -1276,19 +1328,19 @@ function renderGrid(){
   });
 }
 function renderScore(){
-  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, fpQ = 0;
+  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, fpQ = 0, gradQ = 0;
   DATA.forEach(q => {
     if (!matchBase(q)) return;                 // 상단에서 고른 PART·단원 기준
     const v = state.graded[q.id];
     if (v === true || v === false) { done++; if (v === true) right++; }
     const m = mistakes[q.id] || 0;
-    if (m > 0) { wrongQ++; totWrong += m; }
+    if (m > 0) { totWrong += m; if (w2(q.id).g) gradQ++; else wrongQ++; }
     if (marks[q.id]) marked++;
     if (firstPick[q.id]) fpQ++;
   });
   document.getElementById('score').innerHTML =
     `확인 <b>${done}</b>문항 · 맞음 <b>${right}</b>` + (done ? ` · 정답률 <b>${Math.round(right / done * 100)}%</b>` : '') +
-    `<br>📌 핀 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회)` +
+    `<br>📌 핀 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회 · 🎓 졸업 <b>${gradQ}</b>개)` +
     `<br>⚠ 내가 고른 오답 <b>${fpQ}</b>개`;
   const sc = document.getElementById('sideCount');
   if (sc) sc.textContent = `${list.length}문항`;
@@ -1395,6 +1447,7 @@ window.addEventListener('pagehide', saveSelectors);
 
   var snapAns = jclone(state.answers || {}), snapGraded = jclone(state.graded || {});
   var snapMis = jclone(mistakes), snapMarks = jclone(marks), snapHL = jclone(HLS);
+  var snapW2 = jclone(wrong2);
   var snapFP = jclone(firstPick);
 
   var chip = document.getElementById('synchip');
@@ -1413,12 +1466,12 @@ window.addEventListener('pagehide', saveSelectors);
     var dayN = 0;
     keys(d.day).forEach(function(k){ dayN += keys(d.day[k]).length; });
     return !keys(d.ans).length && !keys(d.mis).length && !keys(d.mk).length &&
-           !keys(d.hl).length && !keys(d.fp).length && !dayN;
+           !keys(d.hl).length && !keys(d.fp).length && !keys(d.ws).length && !dayN;
   }
 
   /* ── 로컬 상태 → 클라우드 문서 ─────────────────────────────────────── */
   function buildDoc(){
-    var doc = {v:1, u:Date.now(), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}};
+    var doc = {v:1, u:Date.now(), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}, ws:{}};
     var a = state.answers || {}, g = state.graded || {};
 
     var ids = {};
@@ -1438,6 +1491,12 @@ window.addEventListener('pagehide', saveSelectors);
     });
 
     keys(mistakes).forEach(function(k){ var n = mistakes[k] | 0; if (n > 0) doc.mis[k] = n; });
+
+    /* 🎓 오답 졸업 상태 — [연속 정답 수, 졸업 여부, 시각] */
+    keys(wrong2).forEach(function(k){
+      var e = wrong2[k];
+      if (e && (e.s || e.g || e.t)) doc.ws[k] = [e.s | 0, e.g ? 1 : 0, e.t | 0];
+    });
 
     /* ⚠ 처음 고른 오답 선지 — [선지기호, 시각]  (자동 별표는 mis에서 계산) */
     keys(firstPick).forEach(function(k){
@@ -1481,7 +1540,7 @@ window.addEventListener('pagehide', saveSelectors);
     return (ls >= cs) ? l : c;                          // 결정적 tie-break(두 기기 결과 동일)
   }
   function mergeDocs(L, C){
-    var out = {v:1, u:Math.max(L.u || 0, C.u || 0), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}};
+    var out = {v:1, u:Math.max(L.u || 0, C.u || 0), ans:{}, mis:{}, mk:{}, hl:{}, day:{}, fp:{}, ws:{}};
     var set = {};
     keys(L.ans).forEach(function(k){ set[k] = 1; }); keys(C.ans).forEach(function(k){ set[k] = 1; });
     keys(set).forEach(function(k){
@@ -1493,6 +1552,17 @@ window.addEventListener('pagehide', saveSelectors);
     var s2 = {};
     keys(L.mis).forEach(function(k){ s2[k] = 1; }); keys(C.mis).forEach(function(k){ s2[k] = 1; });
     keys(s2).forEach(function(k){ out.mis[k] = Math.max(L.mis[k] || 0, C.mis[k] || 0); });
+    /* 🎓 오답 졸업 상태는 '더 최근에 손댄 쪽' 기록을 쓴다(같은 시각이면 진행이 더 많은 쪽) */
+    var s2w = {};
+    keys(L.ws).forEach(function(k){ s2w[k] = 1; }); keys(C.ws).forEach(function(k){ s2w[k] = 1; });
+    keys(s2w).forEach(function(k){
+      var l = L.ws[k], c = C.ws[k];
+      if (!l) out.ws[k] = c.slice();
+      else if (!c) out.ws[k] = l.slice();
+      else if ((l[2] || 0) > (c[2] || 0)) out.ws[k] = l.slice();
+      else if ((c[2] || 0) > (l[2] || 0)) out.ws[k] = c.slice();
+      else out.ws[k] = [ Math.max(l[0] | 0, c[0] | 0), Math.max(l[1] | 0, c[1] | 0), l[2] || 0 ];
+    });
     var sfp = {};
     keys(L.fp).forEach(function(k){ sfp[k] = 1; }); keys(C.fp).forEach(function(k){ sfp[k] = 1; });
     keys(sfp).forEach(function(k){
@@ -1563,6 +1633,18 @@ window.addEventListener('pagehide', saveSelectors);
       if (!jEq(mi, mistakes)) redraw = true;
       mistakes = mi;
 
+      var wso = {};
+      keys(doc.ws).forEach(function(k){
+        var e = doc.ws[k] || [];
+        wso[k] = {s: Math.max(0, Math.min(2, e[0] | 0)), g: e[1] ? 1 : 0, t: e[2] | 0};
+      });
+      keys(wrong2).forEach(function(k){                       /* 내 기록이 더 최신이면 그대로 둔다 */
+        var cur = wrong2[k], old = wso[k];
+        if (!old || (cur.t || 0) > (old.t || 0)) wso[k] = {s: cur.s | 0, g: cur.g ? 1 : 0, t: cur.t | 0};
+      });
+      if (!jEq(wso, wrong2)) redraw = true;
+      wrong2 = wso;
+
       var fpo = {};
       keys(doc.fp).forEach(function(k){
         var e = doc.fp[k];
@@ -1608,6 +1690,7 @@ window.addEventListener('pagehide', saveSelectors);
 
       origWriteJSON(LS, state);
       origWriteJSON(LSM, mistakes);
+      origWriteJSON(LSW, wrong2);
       origWriteJSON(LSK, marks);
       origWriteJSON(LSH, HLS);
       origWriteJSON(LSF, firstPick);
@@ -1620,6 +1703,7 @@ window.addEventListener('pagehide', saveSelectors);
       snapAns = jclone(state.answers || {}); snapGraded = jclone(state.graded || {});
       snapMis = jclone(mistakes); snapMarks = jclone(marks); snapHL = jclone(HLS);
       snapFP = jclone(firstPick);
+      snapW2 = jclone(wrong2);
       dirty = false;
     }
     if (redraw) redrawView();
@@ -1656,6 +1740,12 @@ window.addEventListener('pagehide', saveSelectors);
       }
       var mi = readJSON(LSM, {}) || {};
       keys(mi).forEach(function(k){ var v = mi[k] | 0; if (v > (mistakes[k] || 0)) { mistakes[k] = v; changed = true; } });
+      var wsl = readJSON(LSW, {}) || {};
+      keys(wsl).forEach(function(k){
+        var e = wsl[k], cur = wrong2[k];
+        if (!e || typeof e !== 'object') return;
+        if (!cur || (e.t || 0) > (cur.t || 0)) { wrong2[k] = {s: Math.max(0, Math.min(2, e.s | 0)), g: e.g ? 1 : 0, t: e.t | 0}; changed = true; }
+      });
       var mk = readJSON(LSK, {}) || {};
       keys(mk).forEach(function(k){ if (!meta.wm[k] && mk[k] && !marks[k]) { marks[k] = 1; changed = true; } });
       var hl = readJSON(LSH, {}) || {};
@@ -1712,6 +1802,7 @@ window.addEventListener('pagehide', saveSelectors);
     d.mis = (d.mis && typeof d.mis === 'object') ? d.mis : {};
     d.day = (d.day && typeof d.day === 'object') ? d.day : {};
     d.fp  = (d.fp  && typeof d.fp  === 'object') ? d.fp  : {};
+    d.ws  = (d.ws  && typeof d.ws  === 'object') ? d.ws  : {};
     return d;
   }
   function unpack(obj){
@@ -1784,7 +1875,8 @@ window.addEventListener('pagehide', saveSelectors);
         if (isEmptyDoc(merged)) { setChip('ok', '동기화됨', '아직 올릴 기록이 없습니다.'); return null; }
         if (!cloudHas) return pushDoc(merged);                       // 첫 올리기(빈 저장소 채우기)
         var localNew = !jEq(merged.ans, cloud.ans) || !jEq(merged.mis, cloud.mis) ||
-                       !jEq(merged.mk, cloud.mk) || !jEq(merged.hl, cloud.hl) || !jEq(merged.day, cloud.day);
+                       !jEq(merged.mk, cloud.mk) || !jEq(merged.hl, cloud.hl) || !jEq(merged.day, cloud.day) ||
+                       !jEq(merged.ws, cloud.ws);
         var beat = (Date.now() - (meta.push || 0)) > HEARTBEAT;      // 저장소 유지용 되살리기
         if (localNew || beat || reason === 'user') return pushDoc(merged);
         setChip('ok', '동기화됨', '마지막 확인 ' + timeLabel());
@@ -1869,6 +1961,8 @@ window.addEventListener('pagehide', saveSelectors);
           if (!!v[x] !== !!snapMarks[x]) { meta.wm[x] = now; touched = true; }
         });
         snapMarks = jclone(v) || {};
+      } else if (k === LSW) {
+        if (!jEq(v, snapW2)) { touched = true; snapW2 = jclone(v) || {}; }
       } else if (k === LSF) {
         if (!jEq(v, snapFP)) { touched = true; snapFP = jclone(v) || {}; }
       } else if (k === LSH) {

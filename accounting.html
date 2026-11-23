@@ -49,6 +49,8 @@ select{appearance:none;border:1px solid #cfd6e2;background:#fff;border-radius:10
 .b.d-jung{color:var(--jung);background:#fff6dd;border-color:#ecd9a3}
 .b.d-ha{color:var(--ha);background:#eaf7ef;border-color:#bfe3cc}
 .b.miss{color:var(--red);background:#fdeeec;border-color:#f0c8c3}
+.b.streak{color:#8a5a00;background:#fff6dd;border-color:#ecd9a3}
+.b.grad{color:#1f7a48;background:#eaf7ef;border-color:#bfe3cc}
 .star{margin-left:auto;appearance:none;border:1px solid #e2d2a4;background:#fffdf5;color:#c9a227;
   width:48px;height:44px;border-radius:12px;font-size:22px;line-height:1;cursor:pointer}
 .star.on{background:var(--goldbg);border-color:#e0bd52;color:#d29b00}
@@ -288,6 +290,47 @@ mistakes = readJSON(LSM, {}) || {};
 marks = readJSON(LSK, {}) || {};
 if (typeof marks !== 'object' || marks === null) marks = {};
 
+/* ── 🎓 오답 자동 졸업 — 연속 2번 맞히면 오답 목록에서 빠진다 ──────────────────
+   · 틀리면 누적 오답 횟수(mistakes)가 1 늘고 연속 정답은 0/2로 돌아간다.
+   · 오답 목록에 남은 문제를 맞히면 1/2, 한 번 더 맞히면 2/2로 졸업(목록에서 제외)한다.
+   · 졸업해도 누적 오답 횟수·⭐ 별표·📌 핀은 건드리지 않는다 — 별표와 완전히 분리.
+   · 이 기능 전에 쌓인 옛 오답은 연속 정답 정보가 없으므로 '0/2 진행 중'으로 본다. */
+const LSW = LS + '_wrong2';
+let wrong2 = readJSON(LSW, {}) || {};
+if (typeof wrong2 !== 'object' || wrong2 === null || Array.isArray(wrong2)) wrong2 = {};
+(function normW2(){
+  const out = {};
+  Object.keys(wrong2).forEach(k => {
+    const e = wrong2[k];
+    if (!e) return;
+    const s = Array.isArray(e) ? e[0] : e.s;
+    const g = Array.isArray(e) ? e[1] : e.g;
+    const t = Array.isArray(e) ? e[2] : e.t;
+    if (!s && !g && !t) return;
+    out[k] = {s: Math.max(0, Math.min(2, s | 0)), g: g ? 1 : 0, t: t | 0};
+  });
+  wrong2 = out;
+})();
+function w2(id){
+  const e = wrong2[id];
+  return (e && typeof e === 'object' && !Array.isArray(e)) ? e : {s: 0, g: 0, t: 0};
+}
+/* 오답 목록에 남아 있는 문제인가 — 2번 연속 맞혀 졸업한 문제는 빠진다 */
+function isWrongActive(id){ return (mistakes[id] || 0) > 0 && !w2(id).g; }
+function setW2(id, s, g){
+  wrong2[id] = {s: Math.max(0, Math.min(2, s | 0)), g: g ? 1 : 0, t: Date.now()};
+  writeJSON(LSW, wrong2);
+  return wrong2[id];
+}
+/* 맞힘 — 오답 목록에 있는 문제만 센다. 2/2가 되면 졸업(오답 목록에서 제외) */
+function markRight(id){
+  if ((mistakes[id] || 0) <= 0) return null;      /* 한 번도 틀린 적 없는 문제는 그대로 */
+  const cur = w2(id);
+  if (cur.g) return null;                          /* 이미 졸업한 문제는 그대로 */
+  const s = Math.min(2, (cur.s | 0) + 1);
+  return setW2(id, s, s >= 2);
+}
+
 /* ── 오늘 푼 문제 (매일 새벽 6시 리셋) ─────────────────────────────── */
 function dayKey(){
   const d = new Date(Date.now() - 6*3600*1000), p = n => String(n).padStart(2,'0');
@@ -522,7 +565,7 @@ function baseFilter(q){
 }
 function matchView(q){
   if (state.view === 'mark') return !!marks[q.id];
-  if (state.view === 'wrong') return (mistakes[q.id] || 0) > 0;
+  if (state.view === 'wrong') return isWrongActive(q.id);       /* 🎓 두 번 연속 맞힌 문제는 빠진다 */
   return true;
 }
 function counts(){
@@ -530,7 +573,7 @@ function counts(){
   DATA.forEach(q => {
     if (!matchBase(q)) return;
     if (marks[q.id]) mark++;
-    if ((mistakes[q.id] || 0) > 0) wrong++;
+    if (isWrongActive(q.id)) wrong++;
   });
   return {mark, wrong};
 }
@@ -621,6 +664,7 @@ function render(){
   const picked = state.answers[q.id];
   const graded = state.graded[q.id];
   const stored = mistakes[q.id] || 0;
+  const wcur = w2(q.id);
   const isM = !!marks[q.id];
 
   let intro = (q.intro || []).map(t => `<div class="intro hlz" data-hl="intro-${(Math.random()*1e6)|0}">${esc(t)}</div>`).join('');
@@ -670,7 +714,8 @@ function render(){
   if (q.noAns && graded === null) {
     result = `<div class="result warn">이 문항은 현행 기준으로 정답이 없습니다.${stored ? '' : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   } else if (graded === true) {
-    result = `<div class="result ok">정답입니다.${ansLine ? ` (${esc(ansLine)})` : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
+    const gline = stored > 0 ? (wcur.g ? ' 🎓 오답 졸업 완료.' : ` 오답 연속 정답 ${wcur.s}/2${wcur.s < 2 ? ' — 한 번 더 맞히면 졸업합니다.' : ''}`) : '';
+    result = `<div class="result ok">정답입니다.${gline}${ansLine ? ` (${esc(ansLine)})` : ''}<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   } else if (graded === false) {
     result = `<div class="result no">틀렸습니다. (정답 ${esc(ansLine)})<button class="retry" id="btnRetry">다시 풀기</button></div>`;
   }
@@ -710,7 +755,9 @@ function render(){
         <div class="qmeta">
           <span class="b ${q.roundLabel === '2027 개정' ? 'new' : 'round'}">${esc(q.roundLabel)}</span>
           ${diffBadge(q)}
-          ${stored ? `<span class="b miss">누적 오답 ${stored}회</span>` : ''}
+          ${stored ? `<span class="b miss" title="누적 오답 ${stored}회">❌ ${stored}회</span>` : ''}
+          ${stored && !wcur.g ? `<span class="b streak" title="오답 연속 정답 ${wcur.s}/2 — 한 번 더 맞히면 오답에서 졸업합니다">${wcur.s}/2</span>` : ''}
+          ${stored && wcur.g ? `<span class="b grad" title="오답에서 졸업했습니다 — 누적 오답 기록·⭐ 별표는 그대로 남습니다">🎓 오답 졸업</span>` : ''}
         </div>
         <div class="stem hlz" data-hl="stem">${q.stemBr ? esc(q.stem).replace(/○/g, '<br>○') : esc(q.stem)}</div>
       </div>
@@ -741,9 +788,12 @@ function render(){
         return;
       }
       state.graded[q.id] = !!c.ans;
-      if (!c.ans) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); }
+      let grad = null;
+      if (!c.ans) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); setW2(q.id, 0, 0); }
+      else grad = markRight(q.id);
       save(); markDaily(q.id, !!c.ans);
       render(); renderGrid(); renderScore(); buildSelectors();
+      if (grad) toast(grad.g ? '🎓 오답 졸업 — 2번 연속 정답(2/2). 오답 목록에서 빠졌습니다.' : '✅ 1/2 — 한 번 더 맞히면 오답에서 졸업합니다.', 2600);
     };
   });
 
@@ -810,9 +860,12 @@ function gradeShort(){
     return a && (a === b || (a.length >= 2 && b.indexOf(a) >= 0));
   });
   state.graded[q.id] = ok;
-  if (!ok) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); }
+  let grad = null;
+  if (!ok) { mistakes[q.id] = (mistakes[q.id] || 0) + 1; writeJSON(LSM, mistakes); setW2(q.id, 0, 0); }
+  else grad = markRight(q.id);
   save(); markDaily(q.id, ok);
   render(); renderGrid(); renderScore(); buildSelectors();
+  if (grad) toast(grad.g ? '🎓 오답 졸업 — 2번 연속 정답(2/2). 오답 목록에서 빠졌습니다.' : '✅ 1/2 — 한 번 더 맞히면 오답에서 졸업합니다.', 2600);
 }
 
 function go(d){
@@ -846,7 +899,7 @@ function renderGrid(){
 }
 function renderScore(){
   const ids = new Set(DATA.map(q => q.id));
-  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0;
+  let done = 0, right = 0, wrongQ = 0, totWrong = 0, marked = 0, gradQ = 0;
   Object.keys(state.graded || {}).forEach(k => {
     if (!ids.has(k)) return;
     const v = state.graded[k];
@@ -855,12 +908,12 @@ function renderScore(){
   });
   DATA.forEach(q => {
     const m = mistakes[q.id] || 0;
-    if (m > 0) { wrongQ++; totWrong += m; }
+    if (m > 0) { totWrong += m; if (w2(q.id).g) gradQ++; else wrongQ++; }
     if (marks[q.id]) marked++;
   });
   document.getElementById('score').innerHTML =
     `확인 <b>${done}</b>문항 · 맞음 <b>${right}</b>` + (done ? ` · 정답률 <b>${Math.round(right / done * 100)}%</b>` : '') +
-    `<br>★ 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회)`;
+    `<br>★ 마킹 <b>${marked}</b>개 · ✗ 틀린 문제 <b>${wrongQ}</b>개 (누적 오답 <b>${totWrong}</b>회 · 🎓 졸업 <b>${gradQ}</b>개)`;
   const sc = document.getElementById('sideCount');
   if (sc) sc.textContent = `${list.length}문항`;
   renderDaily();
