@@ -196,6 +196,62 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
   .opt .txt{font-size:23px}
   .bogi .bi{font-size:25px}
 }
+/* ═══ 📖 지문 회독 모드 ═════════════════════════════════════════════════════ */
+.selin.moderow{display:flex;flex-wrap:wrap;align-items:center}
+.readtab{margin-left:auto}
+.selin.moderow .modetabs{width:auto;flex:1 1 auto;min-width:0}
+.readtab{appearance:none;flex:0 0 auto;margin-left:8px;border:1px solid #bfd3ea;background:#fff;
+  color:var(--navy);border-radius:99px;padding:7px 13px;font-size:13.5px;font-weight:800;cursor:pointer;
+  white-space:nowrap;display:inline-flex;align-items:center;gap:5px;line-height:1.2;font-family:inherit}
+.readtab:active{background:#eef2f8}
+.readtab.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 0 0 2px rgba(18,58,99,.12)}
+body.readmode .progbar{display:none}                 /* 회독 중에는 진행 막대 대신 문항 수만 */
+body.readmode .progtxt{font-size:11.5px}
+@media (max-width:520px){
+  body.readmode .syn{display:none}                   /* 회독 중에는 ☁️ 칩을 숨겨 '📖 회독 N문항'이 잘리지 않게 */
+}
+#card.plain .rcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;
+  box-shadow:0 1px 2px rgba(18,58,99,.05);scroll-margin-top:calc(var(--headh, 110px) + 10px)}
+#card.plain .rcard + .rcard{margin-top:14px}
+.rcard .rhead{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px}
+.rcard .rno{font-size:20px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.3}
+.rcard .rmeta{flex:1 1 auto;min-width:0;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rcard .runit{font-size:12.5px;font-weight:700;color:#4a5a72}
+.rcard .b.pin{border:1px solid #e2d2a4;background:#fffdf5;color:#a2700a}
+.rcard .opt{cursor:default}
+.rcard .opt.correct:hover{background:var(--greenbg);border-color:var(--green)}
+.rcard .opt:not(.correct):hover{background:#fff;border-color:#dbe2ee}
+.rans{margin:14px 0 0;border:1px solid var(--greenline);background:var(--greenbg);border-radius:12px;
+  padding:11px 14px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;
+  font-size:18px;font-weight:800;color:var(--green)}
+.rans .lab{flex:0 0 auto;border-radius:7px;background:var(--green);color:#fff;font-size:12.5px;font-weight:800;padding:3px 8px}
+.rans .val{font-size:20px;font-weight:800}
+.rans .tx{font-weight:600;color:#175233;font-size:17px;flex:1 1 100%;line-height:1.5}
+.rans.warn{border-color:#ecd9a3;background:#fff7e0;color:#8a6100}
+.rans.warn .lab{background:#8a6100}
+.rcard .exp{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:768px){
+  .rcard .rno{font-size:15px}
+  .rcard .runit{font-size:11px}
+  #card.plain .rcard{padding:12px 14px;border-radius:12px}
+  #card.plain .rcard + .rcard{margin-top:10px}
+  .rans{font-size:14px;padding:8px 10px;border-radius:10px;margin-top:10px}
+  .rans .val{font-size:15px}
+  .rans .tx{font-size:13.5px}
+  .rans .lab{font-size:10.5px;padding:2px 6px}
+}
+@media (max-width:430px){
+  .selin.moderow .modetabs{flex:1 1 100%}
+  .readtab{margin-left:0;margin-top:4px;flex:1 1 100%;justify-content:center;padding:5px 6px;font-size:12px}
+  /* 회독 중에는 위 고정줄을 낮춘다 — 보기 칩은 한 줄로 옆으로 넘겨 고르고, 회독 버튼만 오른쪽에 고정 */
+  body.readmode .selin.moderow{flex-wrap:nowrap}
+  body.readmode .selin.moderow .modetabs{display:flex;flex-wrap:nowrap;align-items:center;min-width:0;
+    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  body.readmode .modetabs::-webkit-scrollbar{display:none}
+  body.readmode .modetabs .mtab{flex:0 0 auto;padding:5px 7px;font-size:11px;gap:2px}
+  body.readmode .modetabs .mtab .cnt{display:none}   /* 회독 중에는 칩 숫자를 빼 한 줄에 다 들어오게 */
+  body.readmode .readtab{margin-left:6px;margin-top:0;flex:0 0 auto;padding:5px 8px;font-size:11.5px}
+}
 </style>
 </head>
 <body>
@@ -217,6 +273,7 @@ body.hlmode .hlz ::selection,body.hlmode .hlz::selection{background:#bcd8ff}
     <select id="selChapter" title="CHAPTER — 교재 목차"></select>
     <select id="selUnit" title="세부 단원"></select>
     <select id="selView" title="보기 범위"></select>
+    <button type="button" class="readtab" id="btnRead" aria-pressed="false" title="이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다">📖 회독 모드</button>
   </div>
 </div>
 </div>
@@ -246,6 +303,26 @@ const HAS_SHORT = false;
 const HAS_SUB = false;
 
 let state, mistakes = {}, marks = {}, list = [], cur = 0;
+const LSR  = LS + '_readmode';            // 📖 회독 모드 ON/OFF — 풀이 기록과 완전히 분리된 전용 키
+const LSRP = LS + '_readpos';             // 📖 조건(단원·필터)별로 읽던 문제 id
+let readMode = readJSON(LSR, false) === true;
+let readLastSig = '';
+let readPos = readJSON(LSRP, {});
+if (!readPos || typeof readPos !== 'object' || Array.isArray(readPos)) readPos = {};
+let readPosTimer = 0;                     // 스크롤 저장 debounce(150ms)
+let readLockUntil = 0;                    // 복원·조건 변경이 옮긴 자리는 읽던 자리가 아니다
+let readTouched = false;                  // 새로고침 복원 뒤 사용자가 직접 움직였는지
+let readCalcN = 0;                        // 회독 모드에서 뺀 계산문제 수(상단 표시·빈 목록 안내용)
+
+
+/* ═══ 계산문제 판별 — 회독 모드에서만 쓴다(평소 풀이 화면은 이 함수를 부르지 않는다) ═══
+   이 페이지(공유용 회계)는 개인용 회계(my-accounting.html)와 같은 400문항이지만 DATA에
+   '말문제/계산문제' 표시가 없다. 그래서 개인용 회계 DATA가 붙인 '계산문제' 282개 id를
+   그대로 옮겨 와 같은 기준으로 가른다(둘은 같은 문제은행이라 분류가 100% 일치한다). */
+const CALC_IDS = new Set('a20-004 a20-005 a20-006 a20-009 a20-010 a20-012 a20-013 a20-014 a20-016 a20-017 a20-018 a20-019 a20-020 a20-021 a20-024 a20-028 a20-029 a20-030 a20-031 a20-032 a20-033 a20-034 a20-035 a20-037 a20-038 a20-039 a20-040 a21-002 a21-003 a21-004 a21-005 a21-006 a21-008 a21-009 a21-012 a21-013 a21-014 a21-015 a21-017 a21-019 a21-020 a21-022 a21-025 a21-026 a21-027 a21-029 a21-030 a21-031 a21-032 a21-033 a21-034 a21-035 a21-036 a21-037 a21-038 a21-039 a21-040 a22-005 a22-007 a22-008 a22-009 a22-010 a22-011 a22-013 a22-014 a22-016 a22-018 a22-019 a22-020 a22-021 a22-022 a22-023 a22-024 a22-025 a22-026 a22-027 a22-028 a22-029 a22-031 a22-032 a22-033 a22-035 a22-036 a22-037 a22-038 a22-039 a22-040 a23-004 a23-005 a23-006 a23-012 a23-013 a23-014 a23-015 a23-017 a23-018 a23-019 a23-021 a23-022 a23-023 a23-024 a23-025 a23-028 a23-029 a23-030 a23-032 a23-033 a23-034 a23-035 a23-036 a23-037 a23-038 a23-039 a23-040 a24-003 a24-007 a24-008 a24-015 a24-017 a24-018 a24-019 a24-021 a24-022 a24-023 a24-024 a24-026 a24-027 a24-028 a24-029 a24-030 a24-032 a24-033 a24-034 a24-035 a24-036 a24-037 a24-038 a24-039 a24-040 a25-002 a25-005 a25-009 a25-010 a25-011 a25-012 a25-015 a25-016 a25-017 a25-018 a25-019 a25-021 a25-022 a25-023 a25-024 a25-027 a25-028 a25-029 a25-030 a25-031 a25-032 a25-033 a25-034 a25-035 a25-036 a25-037 a25-038 a25-039 a25-040 a26-003 a26-008 a26-009 a26-010 a26-011 a26-012 a26-013 a26-014 a26-016 a26-017 a26-019 a26-020 a26-022 a26-023 a26-024 a26-026 a26-027 a26-028 a26-029 a26-030 a26-031 a26-032 a26-033 a26-034 a26-035 a26-036 a26-037 a26-038 a26-039 a26-040 a27-004 a27-005 a27-006 a27-007 a27-008 a27-011 a27-013 a27-016 a27-017 a27-019 a27-020 a27-021 a27-026 a27-027 a27-029 a27-030 a27-031 a27-032 a27-033 a27-034 a27-035 a27-036 a27-037 a27-038 a27-039 a27-040 a28-003 a28-005 a28-010 a28-011 a28-012 a28-013 a28-014 a28-015 a28-017 a28-018 a28-019 a28-020 a28-021 a28-022 a28-024 a28-025 a28-026 a28-027 a28-028 a28-030 a28-031 a28-032 a28-033 a28-034 a28-036 a28-037 a28-038 a28-039 a28-040 a29-002 a29-003 a29-007 a29-009 a29-010 a29-011 a29-012 a29-014 a29-015 a29-016 a29-018 a29-020 a29-021 a29-022 a29-023 a29-024 a29-026 a29-027 a29-028 a29-029 a29-031 a29-032 a29-033 a29-034 a29-036 a29-037 a29-038 a29-039 a29-040'.split(' '));
+const RC_CALC_N = CALC_IDS.size;
+const RC_MAL_N  = DATA.length - CALC_IDS.size;
+function isCalcQ(q){ return !!q && CALC_IDS.has(q.id); }
 
 function readJSON(k, d){ try{ const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; }catch(e){ return d } }
 function writeJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch(e){} }
@@ -700,10 +777,293 @@ function buildSelectors(){
 
 function rebuild(){
   hlOff();
-  list = DATA.filter(q => baseFilter(q) && matchView(q));
+  list = readMode ? buildReadList() : DATA.filter(q => baseFilter(q) && matchView(q));
   cur = Math.min(state.idx || 0, Math.max(0, list.length - 1));
   state.idx = cur;
-  render(); renderGrid(); renderScore();
+  if (readMode) renderRead();                      /* 📖 회독 모드 — 조건에 맞는 말문제를 모두 펼쳐 그린다 */
+  else render();
+  renderGrid(); renderScore();
+}
+
+/* ═══ 📖 지문 회독 모드 ═════════════════════════════════════════════════════
+   고른 단원(또는 필터)의 문제를 위아래로 이어 붙여, 정답 선지 초록 강조·정답 안내·
+   선지별 O/X 해설·핵심/조문/개정 안내·형광펜까지 처음부터 모두 펼쳐 보여 준다.
+   · 📖 회독 모드에서는 계산문제(isCalcQ)를 빼고 말문제만 보여 준다(평소 풀이는 그대로).
+   · 선지를 눌러도 채점·오답·형광펜·동기화 기록이 절대 바뀌지 않는다(누를 곳이 없다).
+   · 회독 중 단원·필터를 바꾸면 그 조건의 말문제로 바로 다시 그린다.
+   · 끄면 원래 1문제씩 푸는 화면으로 돌아가고 채점 기록은 그대로다. */
+function syncReadBtn(){
+  const b = document.getElementById('btnRead');
+  if (!b) return;
+  b.classList.toggle('on', !!readMode);
+  b.setAttribute('aria-pressed', readMode ? 'true' : 'false');
+  b.textContent = readMode ? '📖 회독 모드 ✓' : '📖 회독 모드';
+  b.title = readMode ? '회독 모드를 끄고 1문제씩 푸는 화면으로 돌아갑니다'
+                     : '이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다';
+}
+/* 지금 list가 어떤 조건의 결과인지 — 같은 조건에서 다시 그릴 때 읽던 자리를 지키려고 쓴다 */
+function readSig(){
+  const a = list[0] || {}, z = list[list.length - 1] || {};
+  return [state.part, state.chapter, state.unit, state.sub, state.view,
+          list.length, a.id || '', z.id || ''].join('|');
+}
+/* 📖 회독 모드의 목록 — 지금 조건의 문제 중 계산문제를 뺀 말문제만.
+   빼고 남은 수(readCalcN)는 상단 표시와 빈 목록 안내에 그대로 쓴다. */
+function buildReadList(){
+  const all = DATA.filter(q => baseFilter(q) && matchView(q));
+  const keep = all.filter(q => !isCalcQ(q));
+  readCalcN = all.length - keep.length;
+  return keep;
+}
+function headHeight(){
+  const el = document.querySelector('.stickyhead');
+  if (el && el.offsetHeight) return el.offsetHeight;      /* 지금 실제 높이(회독 모드에서 줄어든 값 포함) */
+  const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--headh'));
+  return (isFinite(v) && v > 0) ? v : 0;
+}
+/* 회독 화면에서 i번째 문제를 상단 고정줄 바로 아래로 가져온다 */
+function scrollToRead(i, smooth){
+  const el = document.querySelectorAll('#card .rcard')[i];
+  if (!el) return;
+  const y = window.pageYOffset + el.getBoundingClientRect().top - headHeight() - 10;
+  window.scrollTo({top: (y > 0 ? y : 0), behavior: smooth ? 'smooth' : 'auto'});
+}
+/* ── 📖 읽던 자리 저장 — 조건(단원·필터)별로 마지막에 보던 문제 id만 따로 남긴다 ──
+   풀이 화면의 cur·state.idx·채점·형광펜·동기화 기록은 건드리지 않고 이 키 하나만 쓴다. */
+function readPosKey(){
+  return [state.part, state.chapter, state.unit, state.sub, state.view].join('|');
+}
+function readTrimPos(){
+  const ks = Object.keys(readPos);
+  for (let i = 0; i < ks.length - 60; i++) delete readPos[ks[i]];   /* 오래된 조건부터 버린다 */
+}
+/* .stickyhead 바로 아래에 보이는 문제의 목록 위치 */
+function readScreenIndex(){
+  const cards = document.querySelectorAll('#card .rcard');
+  if (!cards.length) return -1;
+  const hh = headHeight();
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].getBoundingClientRect().bottom > hh + 6) return i;
+  }
+  return cards.length - 1;
+}
+function saveReadPos(){
+  if (!readMode) return;
+  if (Date.now() < readLockUntil) return;        /* 복원·조건 변경이 옮긴 자리는 저장하지 않는다 */
+  const i = readScreenIndex();
+  const q = (i < 0) ? null : list[i];
+  if (!q || !q.id) return;
+  const k = readPosKey();
+  if (readPos[k] === q.id) return;               /* 같은 자리면 다시 쓰지 않는다 */
+  readPos[k] = q.id; readTrimPos();
+  writeJSON(LSRP, readPos);
+}
+function saveReadPosSoon(){                       /* 스크롤 중 과도한 쓰기를 막는 debounce */
+  if (!readMode) return;
+  clearTimeout(readPosTimer);
+  readPosTimer = setTimeout(saveReadPos, 150);
+}
+function lockReadScroll(ms){ readLockUntil = Date.now() + (ms || 700); }
+/* 저장된 자리로 복원 — 그 문제가 지금 조건에 없으면 첫 문제 그대로 둔다 */
+function restoreReadPos(){
+  if (!readMode || !list.length) return false;
+  const id = readPos[readPosKey()];
+  if (!id) return false;
+  let i = -1;
+  for (let k = 0; k < list.length; k++) { if (list[k].id === id) { i = k; break; } }
+  if (i < 0) return false;
+  scrollToRead(i, false);
+  return true;
+}
+/* 저장된 형광펜을 회독 카드에도 그대로 칠한다 — 카드마다 그 문제(q.id)의 기록만 쓴다 */
+function paintReadHL(){
+  const cards = document.querySelectorAll('#card .rcard');
+  for (let i = 0; i < cards.length; i++) {
+    const rc = cards[i];
+    const store = hlStore(rc.dataset.qid);
+    const ks = Object.keys(store);
+    for (let j = 0; j < ks.length; j++) {
+      const z = rc.querySelector('[data-hl="' + ks[j] + '"]');
+      if (z) paintZone(z, store[ks[j]] || []);
+    }
+  }
+}
+/* 정답 안내 줄 — 선지형은 정답 기호와 그 지문, 빈칸형은 정답 단어 */
+function readAnsLine(q){
+  if (q.short) {
+    const v = (q.blanks || []).map(function(b){ return b || ''; }).join(' / ');
+    return '<div class="rans"><span class="lab">정답</span><span class="val">' + esc(v || '—') + '</span></div>';
+  }
+  if (q.noAns) return '<div class="rans warn"><span class="lab">정답</span><span class="val">현행 기준 정답 없음</span></div>';
+  const c = (q.choices || []).filter(x => x.ans)[0];
+  if (c) return '<div class="rans"><span class="lab">정답</span><span class="val">' + esc(c.n) +
+    '</span><span class="tx hlz" data-hl="ansline">' + esc(c.text) + '</span></div>';
+  return q.ansText ? '<div class="rans"><span class="lab">정답</span><span class="val">' + esc(q.ansText) + '</span></div>' : '';
+}
+/* 해설 묶음 — 풀이 화면(render)의 해설과 같은 순서·같은 형광펜 키를 쓴다 */
+function readExp(q){
+  const cites = (q.cites || []).length
+    ? '<div class="cites"><span class="lab">' + esc(q.citeLabel || '관련 조문') + '</span>' +
+      q.cites.map(c => '<span class="chip">' + esc(c) + '</span>').join(' ') + '</div>'
+    : '';
+  const cores = [];
+  if (q.core) cores.push('<div class="core hlz" data-hl="core">' + esc(q.core) + '</div>');
+  (q.paras || []).forEach((p, i) => { if (p) cores.push('<div class="core hlz" data-hl="para-' + i + '">' + esc(p) + '</div>'); });
+  const core = cores.join('');
+  const choicesAll = q.choices || [];
+  const notedIdx = {}; let nc = 0;
+  choicesAll.forEach((c, ci) => { if (c.note) notedIdx[ci] = nc++; });
+  const notes = choicesAll.filter(c => c.note || c.text).map(c => {
+    const ci = choicesAll.indexOf(c);
+    const hlk = c.note ? 'note-' + notedIdx[ci] : 'note-x' + ci;
+    const mk0 = c.mark || (c.ans ? 'O' : 'X');
+    return '<div class="note ' + (c.ans ? 'on' : '') + '"><span class="no">' + c.n + '</span>' +
+      '<span class="mk ' + mk0 + '">' + mk0 + '</span>' +
+      '<span class="tx hlz" data-hl="' + hlk + '">' + esc(c.note || c.text) + ' ' + rdText(c, q.round) + '</span></div>';
+  }).join('');
+  const notesBox = notes ? '<div class="notes">' + notes + '</div>' : '';
+  const keybox = q.key ? '<div class="keybox hlz" data-hl="key"><b>[핵심]</b> ' + esc(q.key) + '</div>' : '';
+  const terms = (q.terms || []).length
+    ? '<div class="termbox">' + q.terms.map(t => '<div><b>' + esc(t.t) + '</b> — ' + esc(t.d) + '</div>').join('') + '</div>' : '';
+  const extra = (q.extra || []).length
+    ? '<div class="addbox"><span class="lab">추가학습</span>' + q.extra.map((p, i) =>
+        '<div class="addbox-p" data-hl="extra-' + i + '">' + esc(p) + '</div>').join('') + '</div>' : '';
+  const pdf = (q.pdf || []).length
+    ? '<div class="pdfbox"><div class="h">교재 원문 해설</div>' + q.pdf.map(p => '<div>' + esc(p) + '</div>').join('') + '</div>' : '';
+  const boxes = (q.boxes || []).map(b =>
+    '<div class="amendbox"><div class="h">' + esc(b.head || '') + '</div>' + (b.html ? b.body : esc(b.body)) + '</div>').join('');
+  return '<div class="exp">' +
+    (q.citeFirst ? cites + core : core + notesBox + cites) +
+    (q.citeFirst && notes ? notesBox : '') +
+    keybox + terms + extra + pdf + boxes + '</div>';
+}
+/* 회독 카드 1장 — 정답·해설이 처음부터 전부 펼쳐진 상태로 그린다 */
+function readCardOf(q, i){
+  const stored = mistakes[q.id] || 0;
+  const wc = w2(q.id);
+  const lv = Math.min(3, stored);
+  const badges =
+    '<span class="b ' + (q.roundLabel === '2027 개정' ? 'new' : 'round') + '">' + esc(q.roundLabel) + '</span>' +
+    diffBadge(q) +
+    '<span class="runit">' + esc(q.chapter || q.unit || q.part || '') + '</span>' +
+    (stored ? '<span class="b miss" title="누적 오답 ' + stored + '회">❌ ' + stored + '회</span>' : '') +
+    (stored && !wc.g ? '<span class="b streak">' + wc.s + '/2</span>' : '') +
+    (stored && wc.g ? '<span class="b grad">🎓 오답 졸업</span>' : '') +
+    (lv ? '<span class="b auto s' + lv + '">' + '★'.repeat(lv) + '</span>' : '') +
+    (marks[q.id] ? '<span class="b pin">📌</span>' : '');
+
+  const intro = (q.intro || []).map(t => '<div class="intro">' + esc(t) + '</div>').join('');
+  let tables = (q.tables || []).map(t => '<div class="tblwrap">' + t + '</div>').join('');
+  tables += tblHtml(q.tableRows || []);
+  const img = q.img ? '<img class="qimg" alt="' + esc(q.imgAlt || '문제 그림') + '" src="' + q.img + '">' : '';
+
+  let bogi = '';
+  if (q.bogi && q.bogi.length) {
+    const items = q.bogi.map((p, bi) => {
+      const k = p.mk ? '<span class="k">' + esc(p.mk) + '</span>' : '';
+      return '<div class="bi">' + k + '<span class="hlz" data-hl="bogi-' + bi + '">' + esc(p.tx) + '</span></div>';
+    }).join('');
+    bogi = '<div class="bogi ' + (q.letters ? '' : 'law') + '">' + items + '</div>';
+  } else if ((q.choices || []).length && !(q.tables || []).length && !q.img &&
+             q.choices.every(c => /^[ㄱ-ㅎ,\s]+$/.test(c.text))) {
+    bogi = '<div class="bogi law"><div class="bi" style="color:#6b7787">보기 지문은 교재 원문을 참고하세요.</div></div>';
+  }
+
+  let opts = '';
+  if (q.choices && q.choices.length) {
+    opts = '<div class="opts">' + q.choices.map((c, ci) => {
+      const cls = 'opt' + (c.ans ? ' correct' : '');
+      const tag = c.ans ? '<span class="tag">정답</span>' : '';
+      return '<div class="' + cls + '"><span class="num">' + c.n +
+        '</span><span class="txt hlz" data-hl="opt-' + ci + '">' + esc(c.text) + '</span>' + tag + '</div>';
+    }).join('') + '</div>';
+  } else if (q.short) {
+    opts = '<div class="shortbox">' + (q.blanks || ['']).map((b, bi) =>
+      '<div class="srow"><span class="lab">' + ((q.blanks || []).length > 1 ? '빈칸 ' + (bi + 1) : '답') +
+      '</span><input class="sinput" value="" placeholder="정답은 아래 정답 안내 참고" readonly></div>').join('') + '</div>';
+  }
+
+  return '<section class="rcard" id="rq-' + i + '" data-qid="' + esc(q.id) + '">' +
+    '<div class="rhead"><div class="rno">' + (i + 1) + '.</div><div class="rmeta">' + badges + '</div></div>' +
+    '<div class="stem hlz" data-hl="stem">' +
+      (q.stemBr ? esc(q.stem).replace(/○/g, '<br>○') : esc(q.stem)) + '</div>' +
+    intro + bogi + tables + img + opts + readAnsLine(q) + readExp(q) +
+  '</section>';
+}
+/* 회독 화면 전체 — list의 모든 문제를 위아래로 이어 붙인다 */
+function renderRead(){
+  lastValidHL = null;
+  const card = document.getElementById('card');
+  card.classList.add('plain');
+  const sig = readSig(), readLastSig0 = readLastSig;
+  /* 같은 조건에서 다시 그리는 경우(☁️ 동기화 반영 등)에는 읽던 자리를 지킨다 */
+  let keepI = -1, keepTop = 0;
+  if (sig === readLastSig) {
+    const hh = headHeight();
+    const old = card.querySelectorAll('.rcard');
+    for (let i = 0; i < old.length; i++) {
+      const r = old[i].getBoundingClientRect();
+      if (r.bottom > hh + 4) { keepI = i; keepTop = r.top; break; }
+    }
+  }
+  if (!list.length) {
+    card.innerHTML = '<div class="empty">' + (readCalcN
+      ? '📖 회독 모드에서는 계산문제 <b>' + readCalcN + '개</b>를 빼고 말문제만 봅니다.<br>이 조건에는 남은 말문제가 없습니다.<br>위의 단원·보기 조건을 바꿔 보세요.'
+      : '이 조건에 해당하는 문제가 없습니다.<br>위의 단원·보기 조건을 바꿔 보세요.') + '</div>';
+    readLastSig = sig;
+    updateProgress();
+    return;
+  }
+  const out = [];
+  for (let i = 0; i < list.length; i++) out.push(readCardOf(list[i], i));
+  card.innerHTML = out.join('');
+  paintReadHL();
+  readLastSig = sig;
+  if (keepI >= 0) {
+    const el2 = card.querySelectorAll('.rcard')[keepI];
+    if (el2) {
+      const d = el2.getBoundingClientRect().top - keepTop;
+      if (Math.abs(d) > 1) window.scrollBy(0, d);
+    }
+  } else if (sig !== readLastSig0) {
+    lockReadScroll(700);                             /* 조건 변경으로 옮긴 자리는 읽던 자리가 아니다 */
+    window.scrollTo({top: 0, behavior: 'auto'});     /* 단원·필터를 바꾼 경우에는 첫 문제부터 */
+  }
+  updateProgress();
+}
+/* 📖 회독 모드 켜기/끄기 */
+function toggleRead(){
+  /* 끄기 전에 읽던 자리 남긴다 */
+  if (readMode && Date.now() >= readLockUntil) { clearTimeout(readPosTimer); saveReadPos(); }
+  readMode = !readMode;
+  writeJSON(LSR, readMode);                        /* 켠 채로 닫아도 다음에 회독 모드로 열린다 */
+  readLastSig = '';
+  document.body.classList.toggle('readmode', readMode);
+  if (readMode) {
+    const wasHL = hlOff(true);                     /* 형광펜 모드와 겹치지 않게 먼저 끈다 */
+    try { const s = window.getSelection(); if (s && s.removeAllRanges) s.removeAllRanges(); } catch (e) {}
+    hideFloat();
+    list = buildReadList();
+    cur = list.length ? Math.min(Math.max(0, state.idx || 0), list.length - 1) : 0;
+    syncReadBtn();
+    closeDrawer();
+    renderRead(); renderGrid(); renderScore();
+    lockReadScroll(700);
+    if (!restoreReadPos()) scrollToRead(cur, false);
+    toast('📖 회독 모드 — 정답·해설을 모두 펼쳐 봅니다. 기록은 바뀌지 않습니다.' +
+          (readCalcN ? ' 계산문제 ' + readCalcN + '개는 뺐습니다.' : '') +
+          (wasHL ? ' 형광펜 모드는 꺼졌습니다.' : ''), 3000);
+  } else {
+    readCalcN = 0;
+    list = DATA.filter(q => baseFilter(q) && matchView(q));   /* 다시 계산문제까지 포함한 목록 */
+    cur = Math.min(Math.max(0, state.idx || 0), Math.max(0, list.length - 1));
+    syncReadBtn();
+    document.getElementById('card').classList.remove('plain');
+    render();
+    renderGrid(); renderScore();
+    window.scrollTo({top: 0, behavior: 'auto'});
+    toast('📖 회독 모드를 껐습니다. 보던 문제와 기록은 그대로입니다.', 2000);
+  }
 }
 
 /* ── 렌더 ─────────────────────────────────────────────────────────── */
@@ -940,6 +1300,7 @@ function gradeShort(){
 }
 
 function go(d){
+  if (readMode) return;              // 📖 회독 모드에서는 1문제 이동 대신 화면을 그대로 둔다
   const n = cur + d;
   if (n < 0 || n >= list.length) { toast(d > 0 ? '마지막 문제입니다.' : '첫 문제입니다.'); return; }
   hlOff();
@@ -948,6 +1309,12 @@ function go(d){
 }
 function updateProgress(){
   const txt = document.getElementById('progtxt'), fill = document.getElementById('progfill');
+  if (readMode) {
+    txt.textContent = '📖 회독 ' + list.length + '문항' +
+      ((readCalcN && window.innerWidth >= 470) ? ' · 계산 ' + readCalcN + ' 제외' : '');
+    fill.style.width = '100%';
+    return;
+  }
   const total = list.length || 1;
   const done = list.filter(q => state.graded[q.id] !== undefined && state.graded[q.id] !== null).length;
   txt.textContent = `${cur + 1} / ${total} 풀이 · 확인 ${done}`;
@@ -966,7 +1333,17 @@ function renderGrid(){
     return `<div class="${cls}" data-i="${i}">${i + 1}${st}${mc}</div>`;
   }).join('');
   g.querySelectorAll('.gi').forEach(el => {
-    el.onclick = () => { hlOff(); cur = +el.dataset.i; state.idx = cur; save(); render(); closeDrawer(); };
+    el.onclick = () => {
+      const qi = +el.dataset.i;
+      if (readMode) {                              /* 📖 회독 모드 — 채점 없이 그 문제로 이동 */
+        if (!list[qi]) return;
+        cur = qi; renderGrid(); updateProgress(); closeDrawer();
+        scrollToRead(qi, true);
+        if (list[qi].id) { readPos[readPosKey()] = list[qi].id; readTrimPos(); writeJSON(LSRP, readPos); }
+        return;
+      }
+      hlOff(); cur = +el.dataset.i; state.idx = cur; save(); render(); closeDrawer();
+    };
   });
 }
 function renderScore(){
@@ -995,6 +1372,7 @@ function closeDrawer(){ document.querySelector('.drawer').classList.remove('open
 
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (readMode) return;                 /* 📖 회독 모드 — 숫자·화살표 키로 채점/이동하지 않는다 */
   if (e.key === 'ArrowRight') go(1);
   else if (e.key === 'ArrowLeft') go(-1);
   else if (/^[1-5]$/.test(e.key)) {
@@ -1003,6 +1381,7 @@ document.addEventListener('keydown', e => {
     if (el) el.click();
   }
 });
+document.getElementById('btnRead').onclick = toggleRead;
 document.getElementById('btnList').onclick = () => {
   const d = document.querySelector('.drawer');
   if (d.classList.contains('open')) closeDrawer(); else openDrawer();
@@ -1040,6 +1419,37 @@ hlBoot = false;                                  // 첫 화면 완료 — 이후
 function saveSelectors(){ try { save(); } catch(e){} }
 document.addEventListener('visibilitychange', function(){ if (document.hidden) saveSelectors(); });
 window.addEventListener('pagehide', saveSelectors);
+
+/* 📖 회독 모드 — 스크롤할 때마다(150ms debounce) 읽던 자리를 저장하고, 화면을 닫을 때도 남긴다 */
+window.addEventListener('scroll', function(){ if (readMode) saveReadPosSoon(); }, {passive: true});
+['pointerdown', 'touchstart', 'keydown'].forEach(function(ev){
+  document.addEventListener(ev, function(){ readTouched = true; }, true);
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden && readMode) { clearTimeout(readPosTimer); saveReadPos(); }
+});
+window.addEventListener('pagehide', function(){
+  if (readMode) { clearTimeout(readPosTimer); saveReadPos(); }
+});
+
+/* 📖 회독 모드로 닫았으면 — 다시 열 때 회독 모드 그대로, 읽던 문제 자리로 복원한다 */
+if (readMode) {
+  if (hlOn) {                                    /* 회독 모드와 형광펜 모드는 함께 켜지 않는다 */
+    hlOn = false; writeJSON(LS + '_hlon', false);
+    document.body.classList.remove('hlmode');
+    const bh0 = document.getElementById('btnHL'); if (bh0) bh0.classList.remove('on');
+  }
+  document.body.classList.add('readmode');
+  syncReadBtn();
+  lockReadScroll(900);
+  restoreReadPos();
+  [260, 900].forEach(function(t){                /* 이미지·글꼴이 늦게 붙어도 자리를 다시 맞춘다 */
+    setTimeout(function(){
+      if (readMode && !readTouched) { lockReadScroll(400); restoreReadPos(); }
+    }, t);
+  });
+  updateProgress();
+}
 
 
 /* ── 상단 두 줄의 실제 높이를 재서 사이드바·여백에 넘긴다 ────────────────
