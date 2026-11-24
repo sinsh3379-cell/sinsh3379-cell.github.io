@@ -450,7 +450,15 @@ const HAS_SHORT = false;
 const HAS_SUB = false;
 
 let state, mistakes = {}, marks = {}, list = [], cur = 0;
-let readMode = false, readLastSig = '';   // 📖 회독 모드 상태(저장하지 않는다 — 열 때마다 풀이 화면에서 시작)
+const LSR  = LS + '_readmode';            // 📖 회독 모드 ON/OFF — 풀이 기록과 완전히 분리된 전용 키
+const LSRP = LS + '_readpos';             // 📖 조건(단원·필터)별로 읽던 문제 id
+let readMode = readJSON(LSR, false) === true;
+let readLastSig = '';
+let readPos = readJSON(LSRP, {});
+if (!readPos || typeof readPos !== 'object' || Array.isArray(readPos)) readPos = {};
+let readPosTimer = 0;                     // 스크롤 저장 debounce(150ms)
+let readLockUntil = 0;                    // 복원·조건 변경이 옮긴 자리는 '읽던 자리'가 아니다
+let readTouched = false;                  // 새로고침 복원 뒤 사용자가 직접 움직였는지
 
 function readJSON(k, d){ try{ const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; }catch(e){ return d } }
 function writeJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)) }catch(e){} }
@@ -1320,6 +1328,53 @@ function scrollToRead(i, smooth){
   const y = window.pageYOffset + el.getBoundingClientRect().top - headHeight() - 10;
   window.scrollTo({top: (y > 0 ? y : 0), behavior: smooth ? 'smooth' : 'auto'});
 }
+/* ── 📖 읽던 자리 저장 — 조건(단원·필터)별로 마지막에 보던 문제 id만 따로 남긴다 ──
+   풀이 화면의 cur·state.idx·채점·형광펜·동기화 기록은 건드리지 않고 이 키 하나만 쓴다. */
+function readPosKey(){
+  return [state.part, state.unit, state.sub, state.view, state.star].join('|');
+}
+function readTrimPos(){
+  const ks = Object.keys(readPos);
+  for (let i = 0; i < ks.length - 60; i++) delete readPos[ks[i]];   /* 오래된 조건부터 버린다 */
+}
+/* .stickyhead 바로 아래에 보이는 문제의 목록 위치 */
+function readScreenIndex(){
+  const cards = document.querySelectorAll('#card .rcard');
+  if (!cards.length) return -1;
+  const hh = headHeight();
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].getBoundingClientRect().bottom > hh + 6) return i;
+  }
+  return cards.length - 1;
+}
+function saveReadPos(){
+  if (!readMode) return;
+  if (Date.now() < readLockUntil) return;        /* 복원·조건 변경이 옮긴 자리는 저장하지 않는다 */
+  const i = readScreenIndex();
+  const q = (i < 0) ? null : list[i];
+  if (!q || !q.id) return;
+  const k = readPosKey();
+  if (readPos[k] === q.id) return;               /* 같은 자리면 다시 쓰지 않는다 */
+  readPos[k] = q.id; readTrimPos();
+  writeJSON(LSRP, readPos);
+}
+function saveReadPosSoon(){                       /* 스크롤 중 과도한 쓰기를 막는 debounce */
+  if (!readMode) return;
+  clearTimeout(readPosTimer);
+  readPosTimer = setTimeout(saveReadPos, 150);
+}
+function lockReadScroll(ms){ readLockUntil = Date.now() + (ms || 700); }
+/* 저장된 자리로 복원 — 그 문제가 지금 조건에 없으면 첫 문제 그대로 둔다 */
+function restoreReadPos(){
+  if (!readMode || !list.length) return false;
+  const id = readPos[readPosKey()];
+  if (!id) return false;
+  let i = -1;
+  for (let k = 0; k < list.length; k++) { if (list[k].id === id) { i = k; break; } }
+  if (i < 0) return false;
+  scrollToRead(i, false);
+  return true;
+}
 /* 저장된 형광펜을 회독 카드에도 그대로 칠한다 — 카드마다 그 문제(q.id)의 기록만 쓴다 */
 function paintReadHL(){
   const cards = document.querySelectorAll('#card .rcard');
@@ -1469,13 +1524,16 @@ function renderRead(){
       if (Math.abs(d) > 1) window.scrollBy(0, d);
     }
   } else if (sig !== readLastSig0) {
+    lockReadScroll(700);                             /* 조건 변경으로 옮긴 자리는 읽던 자리가 아니다 */
     window.scrollTo({top: 0, behavior: 'auto'});     /* 단원·필터를 바꾼 경우에는 첫 문제부터 */
   }
   updateProgress();
 }
 /* 📖 회독 모드 켜기/끄기 */
 function toggleRead(){
+  if (readMode && Date.now() >= readLockUntil) { clearTimeout(readPosTimer); saveReadPos(); }  /* 끄기 전에 읽던 자리 남긴다 */
   readMode = !readMode;
+  writeJSON(LSR, readMode);                        /* 켠 채로 닫아도 다음에 회독 모드로 열린다 */
   readLastSig = '';
   document.body.classList.toggle('readmode', readMode);
   if (readMode) {
@@ -1488,6 +1546,7 @@ function toggleRead(){
     syncReadBtn();
     closeDrawer();
     renderRead(); renderGrid(); renderScore();
+    lockReadScroll(700);
     scrollToRead(cur, false);
     toast('📖 회독 모드 — 정답·해설을 모두 펼쳐 봅니다. 기록은 바뀌지 않습니다.' +
           (wasHL ? ' 형광펜 모드는 꺼졌습니다.' : ''), 2800);
@@ -1626,6 +1685,9 @@ function renderGrid(){
         if (!list[qi]) return;
         cur = qi; state.idx = qi; save();
         scrollToRead(qi, true); renderGrid(); updateProgress(); closeDrawer();
+        if (list[qi].id) {                         /* 목록에서 고른 문제를 읽던 자리로 남긴다 */
+          readPos[readPosKey()] = list[qi].id; readTrimPos(); writeJSON(LSRP, readPos);
+        }
         return;
       }
       if (state.view === 'fp') { closeDrawer(); focusQuestion((list[qi] || {}).id); return; }
@@ -1721,11 +1783,42 @@ buildSelectors();
 rebuild();
 hlBoot = false;                                  // 첫 화면 완료 — 이후부터는 문제 이동·필터 변경 때 형광펜 자동 해제
 
+/* 📖 회독 모드로 닫았으면 — 다시 열 때 회독 모드 그대로, 읽던 문제 자리로 복원한다 */
+if (readMode) {
+  if (hlOn) {                                    /* 회독 모드와 형광펜 모드는 함께 켜지 않는다 */
+    hlOn = false; writeJSON(LS + '_hlon', false);
+    document.body.classList.remove('hlmode');
+    const bh0 = document.getElementById('btnHL'); if (bh0) bh0.classList.remove('on');
+  }
+  document.body.classList.add('readmode');
+  syncReadBtn();
+  lockReadScroll(900);
+  restoreReadPos();
+  [260, 900].forEach(function(t){                /* 이미지·글꼴이 늦게 붙어도 자리를 다시 맞춘다 */
+    setTimeout(function(){
+      if (readMode && !readTouched) { lockReadScroll(400); restoreReadPos(); }
+    }, t);
+  });
+  updateProgress();
+}
+
 /* 상단 카테고리 선택값은 바뀔 때 즉시 저장되지만,
    폰·태블릿에서 화면을 벗어나거나 앱이 페이지를 접을 때도 한 번 더 남긴다. */
 function saveSelectors(){ try { save(); } catch(e){} }
 document.addEventListener('visibilitychange', function(){ if (document.hidden) saveSelectors(); });
 window.addEventListener('pagehide', saveSelectors);
+
+/* 📖 회독 모드 — 스크롤할 때마다(150ms debounce) 읽던 자리를 저장하고, 화면을 닫을 때도 남긴다 */
+window.addEventListener('scroll', function(){ if (readMode) saveReadPosSoon(); }, {passive: true});
+['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function(ev){
+  document.addEventListener(ev, function(){ readTouched = true; }, true);
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.hidden && readMode) { clearTimeout(readPosTimer); saveReadPos(); }
+});
+window.addEventListener('pagehide', function(){
+  if (readMode) { clearTimeout(readPosTimer); saveReadPos(); }
+});
 
 
 /* ── ☁️ 기기 간 자동 동기화 (회사 태블릿 · 집 태블릿 · 스마트폰) ─────────────
