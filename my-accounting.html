@@ -558,6 +558,155 @@ body.exampaused .exsp{display:inline}
   .exw{padding:10px 11px}.exw .exwstem{font-size:14px}
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   🔥 최근 3개년 · 🧩 빈칸 암기 · ⚡ 지문 O/X · 📝 메모 · 📄 오답 PDF  (2026-11-25)
+   ─ 기존 화면(형광펜·회독·레이더·모의고사) 위에 얹기만 하고 기록 키는 건드리지 않는다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 상단 새 버튼 줄 ─────────────────────────────────────────────── */
+.selin.newrow{padding-top:0;padding-bottom:9px;gap:7px}
+.nfb{appearance:none;flex:0 0 auto;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:10px;
+  padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;
+  display:inline-flex;align-items:center;gap:4px;line-height:1.2;white-space:nowrap}
+.nfb .nic{margin-right:1px}
+.nfb .ns{display:none}
+.nfb:active{background:#eef2f8}
+.nfb .nic{font-size:14px;line-height:1}
+.nfb.y3{border-color:#f0c9a0;background:#fff8ef;color:#8a4a00}
+.nfb.y3.on{background:#b85c00;border-color:#b85c00;color:#fff;box-shadow:0 0 0 2px rgba(184,92,0,.15)}
+.nfb.blank{border-color:#c9bce8;background:#f8f5ff;color:#4b2c8a}
+.nfb.blank.on{background:#5b34a8;border-color:#5b34a8;color:#fff;box-shadow:0 0 0 2px rgba(91,52,168,.15)}
+.nfb.ox{border-color:#a9d8cd;background:#f2fbf8;color:#0d5c4b}
+.nfb.ox.on{background:#0f6b57;border-color:#0f6b57;color:#fff;box-shadow:0 0 0 2px rgba(15,107,87,.15)}
+.nfb.pdf{border-color:#c8d3e2;background:#f7f9fc;color:#243a5e}
+@media (max-width:430px){
+  .selin.newrow{gap:5px;padding:0 12px 8px}
+  .nfb{flex:1 1 0;min-width:0;justify-content:center;font-size:11.5px;padding:6px 4px;gap:2px;overflow:hidden}
+  .nfb .nlbl{display:none}
+  .nfb .ns{display:inline;overflow:hidden;text-overflow:ellipsis}
+  body.readmode .nfb{font-size:11px;padding:5px 3px}
+}
+
+/* ── 🧩 빈칸 ─────────────────────────────────────────────────────── */
+.modenote{margin:0 0 12px;border:1px dashed #c9bce8;background:#f8f5ff;color:#4b2c8a;border-radius:10px;
+  padding:8px 11px;font-size:12.5px;font-weight:800;line-height:1.5}
+.modenote .mnum{color:#5b34a8;font-variant-numeric:tabular-nums}
+.bk{appearance:none;border:0;border-bottom:1.6px dashed #8b78c4;background:#f1ecfb;color:#5b34a8;
+  border-radius:5px;padding:1px 6px;margin:0 2px;font:inherit;font-size:.94em;font-weight:800;
+  cursor:pointer;line-height:1.45;vertical-align:baseline;word-break:keep-all}
+.bk:active{background:#e4d9fa}
+.bk.on{background:#eaf7ef;border-bottom-color:#8fc7a6;color:#14603c;font-weight:900}
+body.blankmode .opt.correct .txt{background:#eaf7ef;border-radius:5px}
+
+/* ── 📝 메모 ─────────────────────────────────────────────────────── */
+.memobox{margin-top:14px;border:1px solid #e0e6f0;border-radius:12px;background:#fbfcfe;padding:10px 12px}
+.memobox .mh{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:#3a4a63;margin-bottom:6px}
+.memobox .msave{margin-left:auto;font-weight:700;color:#7a8497;font-size:11.5px}
+.memobox .msave.ok{color:#1f6b41}
+.memobox textarea{width:100%;border:1px solid #d8e0ec;border-radius:9px;padding:9px 10px;font-size:14px;
+  line-height:1.55;resize:vertical;min-height:46px;background:#fff;color:#151c28;font-family:inherit;
+  display:block}
+.memobox textarea:focus{outline:none;border-color:#9db4d4;box-shadow:0 0 0 3px rgba(29,79,128,.1)}
+.memobox .mhint{font-size:11.5px;color:#7a8497;margin-top:5px;line-height:1.5}
+.b.memo{color:#5b34a8;background:#f3efff;border:1px solid #d5c8f2}
+.gi .mst{font-size:10px;margin-left:2px;line-height:1}
+
+/* ── ⚡ 지문 O/X 퀴즈 ──────────────────────────────────────────────── */
+.oxback{position:fixed;inset:0;background:rgba(10,20,35,.45);opacity:0;pointer-events:none;
+  transition:opacity .16s;z-index:60}
+body.oxopen .oxback{opacity:1;pointer-events:auto}
+.oxpanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.97);
+  width:min(580px,calc(100% - 24px));max-height:min(88vh,780px);display:flex;flex-direction:column;
+  background:#fff;border-radius:18px;box-shadow:0 18px 50px rgba(10,20,35,.32);z-index:61;
+  opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
+body.oxopen .oxpanel{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.oxhd{display:flex;align-items:center;gap:9px;padding:12px 15px;background:#0f6b57;color:#fff;flex:0 0 auto}
+.oxhd .oxt{font-size:15px;font-weight:900}
+.oxhd .oxsub{font-size:11.5px;font-weight:700;opacity:.9}
+.oxhd .oxx{margin-left:auto;appearance:none;border:1px solid rgba(255,255,255,.5);background:transparent;
+  color:#fff;border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.oxprog{height:5px;background:#e3eeea;flex:0 0 auto}
+.oxprog i{display:block;height:100%;width:0;background:#0f6b57;transition:width .2s}
+.oxbody{padding:15px 16px 4px;overflow:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.oxq{font-size:11.5px;font-weight:800;color:#5b6b80;line-height:1.5;margin-bottom:10px}
+.oxq .oxqn{color:#0f6b57;margin-right:5px}
+.oxchoice{border:1px solid #dfe7ee;background:#f8fafc;border-radius:13px;padding:14px 15px;
+  font-size:16px;line-height:1.65;font-weight:700;color:#16202e;min-height:64px}
+.oxchoice .oxcno{display:inline-block;font-weight:900;color:#0f6b57;margin-right:6px}
+.oxbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0 4px}
+.oxb{appearance:none;border-radius:14px;padding:16px 10px;font-size:19px;font-weight:900;cursor:pointer;
+  font-family:inherit;border:2px solid}
+.oxb.o{border-color:#8fc7a6;background:#eef9f2;color:#14603c}
+.oxb.x{border-color:#e9b6b0;background:#fdf0ee;color:#9c332a}
+.oxb:active{transform:scale(.985)}
+.oxb:disabled{opacity:.45;cursor:default;transform:none}
+.oxb.sel:disabled{opacity:1}
+.oxb.o.sel{background:#1f6b41;border-color:#1f6b41;color:#fff}
+.oxb.x.sel{background:#a8382f;border-color:#a8382f;color:#fff}
+.oxfb{margin-top:12px;border-radius:12px;padding:11px 13px;font-size:13.5px;line-height:1.65;display:none}
+.oxfb.show{display:block}
+.oxfb.ok{background:#eef9f2;border:1px solid #bfe3cc;color:#14563a}
+.oxfb.no{background:#fdf0ee;border:1px solid #f3c9c4;color:#8f2f27}
+.oxfb .oxans{font-size:15px;font-weight:900;display:block;margin-bottom:4px}
+.oxfb .oxnote{margin-top:6px;border-top:1px dashed rgba(0,0,0,.12);padding-top:6px;color:#2c3748;font-weight:600}
+.oxfoot{display:flex;align-items:center;gap:10px;padding:11px 16px 14px;flex:0 0 auto;border-top:1px solid #eef1f6}
+.oxscore{font-size:12.5px;font-weight:800;color:#5b6b80;font-variant-numeric:tabular-nums}
+.oxnext{margin-left:auto;appearance:none;border:1px solid #0f6b57;background:#0f6b57;color:#fff;
+  border-radius:11px;padding:11px 18px;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit}
+.oxnext:disabled{opacity:.4;cursor:default}
+.oxnote-skip{font-size:12px;color:#7a8497;font-weight:700}
+@media (max-width:430px){
+  .oxpanel{width:calc(100% - 14px);max-height:92vh}
+  .oxchoice{font-size:15px;padding:12px 13px}
+  .oxb{font-size:17px;padding:14px 8px}
+}
+
+/* ── 📄 오답노트 PDF(인쇄) ─────────────────────────────────────────── */
+.pdfview{display:none}
+body.pdfopen .pdfview{display:block;position:fixed;inset:0;z-index:70;background:#eef1f6;overflow:auto;padding:0 0 60px}
+.pdfbar{position:sticky;top:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  background:#123a63;color:#fff;padding:10px 14px;z-index:2}
+.pdfbar .pt{font-size:13.5px;font-weight:900}
+@media (max-width:430px){.pdfbar .pcount{order:2}.pdfbar .pbtn{margin-left:0}.pdfbar .pbtn.go{margin-left:auto}}
+.pdfbar .pcount{font-size:11.5px;font-weight:700;opacity:.9}
+.pdfbar .pbtn{margin-left:auto;appearance:none;border:1px solid rgba(255,255,255,.5);background:transparent;
+  color:#fff;border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.pdfbar .pbtn.go{background:#fff;color:#123a63;border-color:#fff}
+.pdfsheet{background:#fff;max-width:820px;margin:16px auto;padding:26px 30px 34px;border-radius:6px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);color:#111}
+.pdfsheet h1{font-size:19px;margin:0 0 3px;color:#123a63}
+.pdfsheet .pmeta{font-size:11.5px;color:#4b5563;border-bottom:1.6px solid #1f2937;padding-bottom:8px;margin-bottom:6px;line-height:1.6}
+.pdfsheet .pstars{font-size:11.5px;color:#374151;margin-bottom:10px;font-weight:700}
+.pdfsheet .punit{font-size:11px;font-weight:800;color:#1d4f80;background:#eef3fa;border:1px solid #d8e3f1;
+  border-radius:6px;padding:1px 6px;margin:12px 0 2px;display:inline-block}
+.pdfitem{break-inside:avoid;page-break-inside:avoid;border-bottom:1px solid #d8dde5;padding:9px 0 11px}
+.pdfitem .ph{display:flex;align-items:baseline;gap:7px;font-size:11.5px;font-weight:800;color:#4b5563;flex-wrap:wrap}
+.pdfitem .ph .no{font-size:13.5px;font-weight:900;color:#123a63}
+.pdfitem .ph .pstar{color:#a8382f}
+.pdfitem .pstem{font-size:12.8px;font-weight:800;line-height:1.55;color:#111827;margin:4px 0 5px}
+.pdfitem .pans{font-size:12px;font-weight:800;color:#14563a;line-height:1.5}
+.pdfitem .pans .l{display:inline-block;background:#eaf7ef;border:1px solid #bfe3cc;border-radius:5px;padding:0 5px;margin-right:5px;font-size:10.5px}
+.pdfitem .pmemo{font-size:12px;font-weight:800;color:#4b2c8a;background:#f6f2ff;border:1px solid #ded2f7;
+  border-radius:6px;padding:4px 7px;margin-top:5px;line-height:1.5}
+.pdfitem .pexp{font-size:11.6px;line-height:1.6;color:#1f2937;margin-top:5px}
+.pdfitem .pexp .k{color:#8a6100;font-weight:800}
+.pdfempty{font-size:13px;color:#4b5563;line-height:1.7;padding:10px 0}
+.pdffoot{margin-top:14px;border-top:1px solid #d8dde5;padding-top:8px;font-size:10.5px;color:#6b7280}
+@media print{
+  @page{size:A4;margin:13mm 12mm}
+  html,body{background:#fff !important}
+  body.pdfopen .stickyhead,body.pdfopen .shell,body.pdfopen .drawer,body.pdfopen .hlfloat,
+  body.pdfopen .toast,body.pdfopen .radarback,body.pdfopen .radarpanel,
+  body.pdfopen .oxback,body.pdfopen .oxpanel{display:none !important}
+  .pdfview{position:static !important;display:block !important;background:#fff !important;
+    overflow:visible !important;padding:0 !important}
+  .pdfbar{display:none !important}
+  .pdfsheet{box-shadow:none !important;margin:0 !important;max-width:none !important;
+    padding:0 !important;border-radius:0 !important}
+  .pdfitem{padding:7px 0 9px}
+}
+
 </style>
 </head>
 <body>
@@ -585,6 +734,13 @@ body.exampaused .exsp{display:inline}
   <div class="selin moderow"><div class="modetabs" id="modeTabs"></div><button type="button" class="readtab" id="btnRead" aria-pressed="false" title="이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다">📖 회독 모드</button><button type="button" class="readtab radartab" id="btnRadar" title="단원별 정답률·남은 오답을 한눈에 보고 취약 단원으로 바로 이동합니다"><span class="ric">📊</span><span class="rlbl">약점 레이더</span></button><button type="button" class="readtab examtab" id="btnExam" title="객관식 40문항 · 50분 실전 모의고사 (단원 학습 기록은 건드리지 않습니다)"><span class="ric">⏱️</span><span class="rlbl">모의고사</span></button></div>
 </div>
 
+
+<div class="selin newrow" id="newRow">
+  <button type="button" class="nfb y3" id="btnY3" aria-pressed="false" title="27·28·29회에 나온 문항(선지 출처 포함)만 모아 봅니다"><span class="nic">🔥</span><span class="nlbl">최근 3개년</span></button>
+  <button type="button" class="nfb blank" id="btnBlank" aria-pressed="false" title="정답 지문·해설의 숫자와 조문을 [ ___ ]로 가립니다 — 눌러서 확인"><span class="nic">🧩</span><span class="nlbl">빈칸 암기</span></button>
+  <button type="button" class="nfb ox" id="btnOX" title="5지선다의 각 지문을 하나씩 O/X로 판별하는 스피드 퀴즈 (연습 — 기록 불변)"><span class="nic">⚡</span><span class="nlbl">O/X 퀴즈</span></button>
+  <button type="button" class="nfb pdf" id="btnPDF" title="지금 남아 있는 오답과 내 메모를 A4로 인쇄·PDF 저장"><span class="nic">📄</span><span class="nlbl">오답 PDF</span></button>
+</div>
 <div class="examrow" id="examBar">
   <div class="exin">
     <span class="exclock" id="exClock">50:00</span>
@@ -3310,6 +3466,600 @@ window.addEventListener('beforeunload', function(){ if (EX.on) clearInterval(EX.
 window.__radarExam = {radarRows: radarRows, openRadar: openRadar, closeRadar: closeRadar,
   startExam: startExam, submitExam: submitExam, exitExam: exitExam, EX: EX,
   state: function(){ return {level: RLEVEL, sort: RSORT, hasCh: HAS_CH}; }};
+})();
+
+</script>
+
+<div class="oxback" id="oxBack"></div>
+<div class="oxpanel" id="oxPanel"></div>
+<div class="pdfview" id="pdfview"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   🔥 최근 3개년 · 🧩 빈칸 암기 · ⚡ 지문 O/X · 📝 1줄 메모 · 📄 오답 PDF  (2026-11-25)
+   ─ 기존 채점·오답·형광펜·회독·레이더·모의고사·동기화 기록은 읽기만 하고 건드리지 않는다.
+   ─ O/X 퀴즈는 화면 안에서만 도는 연습이고, 정답을 골라도 state·mistakes는 변하지 않는다.
+   ─ 새 저장 키는 세 개뿐: LS+'_y3'(필터) · LS+'_blank'(빈칸) · LS+'_memo1'(메모)
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+if (window.__cbtFull) return;
+
+var KY = LS + '_y3';
+var KB = LS + '_blank';
+var KM = LS + '_memo1';
+
+function $(id){ return document.getElementById(id); }
+function R(k, d){ try { return readJSON(k, d); } catch(e){ return d; } }
+function W(k, v){ try { writeJSON(k, v); } catch(e){} }
+function esc2(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(m){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m]; }); }
+function say(msg, ms){ try { toast(msg, ms); } catch(e){} }
+function exOn(){ return !!(window.__radarExam && window.__radarExam.EX && window.__radarExam.EX.on); }
+function brandName(){
+  var b = document.querySelector('.brand');
+  var t = b ? (b.childNodes[0] && b.childNodes[0].nodeValue ? b.childNodes[0].nodeValue : b.textContent) : '';
+  t = String(t || '').trim();
+  return t || String(document.title || '').split('—')[0].trim() || '주택관리사 CBT';
+}
+
+var Y3    = R(KY, false) === true;         /* 🔥 최근 3개년 */
+var BLANK = R(KB, false) === true;         /* 🧩 빈칸 암기 */
+var MEMO  = R(KM, {}) || {};
+if (!MEMO || typeof MEMO !== 'object' || Array.isArray(MEMO)) MEMO = {};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ① 🔥 최근 3개년(27·28·29회) 필터 — 기존 baseFilter 위에 한 겹만 얹는다
+   ═══════════════════════════════════════════════════════════════════════════ */
+function y3hit(q){
+  var r = q.round;
+  if (r === 27 || r === 28 || r === 29) return true;
+  var cs = q.choices || [];
+  for (var i = 0; i < cs.length; i++){
+    var rs = cs[i].rnd || [];
+    for (var j = 0; j < rs.length; j++){
+      var v = rs[j];
+      if (v === 27 || v === 28 || v === 29) return true;
+    }
+  }
+  return false;
+}
+var _base = window.baseFilter;
+if (typeof _base === 'function'){
+  window.baseFilter = function(q){
+    if (!_base.apply(this, arguments)) return false;
+    if (Y3 && !y3hit(q)) return false;
+    return true;
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ② 🧩 빈칸 암기 — 정답 지문·해설 안의 숫자·조문만 [ ___ ] 버튼으로 가린다
+   ═══════════════════════════════════════════════════════════════════════════ */
+var NUM_UNITS = '년|개년|개월|월|일|시간|분|초|%|퍼센트|원|㎡|m²|제곱미터|평|층|세대|호|인|명|회|개|점|배';
+var TOK = new RegExp('\\d[\\d,\\.]*\\s?(?:' + NUM_UNITS + ')|제\\s?\\d+조(?:의\\s?\\d+)?|제\\s?\\d+항|제\\s?\\d+호', 'g');
+var MASK_SEL = '.opt.correct .txt, .rans .tx, .core, .note .tx, .keybox, .termbox, .addbox-p, .amendbox';
+
+function blankBtn(ans){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'bk';
+  b.setAttribute('data-a', ans);
+  b.setAttribute('aria-label', '빈칸 — 눌러서 정답 확인');
+  b.textContent = '[ ___ ]';
+  return b;
+}
+function maskText(root, stat){
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+  var nodes = [], n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  for (var k = 0; k < nodes.length; k++){
+    var tn = nodes[k], v = tn.nodeValue;
+    if (!v || !/\d/.test(v)) continue;
+    var p = tn.parentNode;
+    if (p && p.closest && p.closest('mark,.bk,button,input,textarea,select,.rd')) continue;
+    TOK.lastIndex = 0;
+    var m, last = 0, frag = null;
+    while ((m = TOK.exec(v))){
+      if (!frag) frag = document.createDocumentFragment();
+      if (m.index > last) frag.appendChild(document.createTextNode(v.slice(last, m.index)));
+      frag.appendChild(blankBtn(m[0]));
+      last = m.index + m[0].length;
+      stat.n++;
+    }
+    if (frag){
+      if (last < v.length) frag.appendChild(document.createTextNode(v.slice(last)));
+      tn.parentNode.replaceChild(frag, tn);
+    }
+  }
+}
+function maskZones(root, stat){
+  var zones = root.querySelectorAll(MASK_SEL);
+  for (var i = 0; i < zones.length; i++) maskText(zones[i], stat);
+  /* 관련 조문 chip 은 통째로 한 칸 */
+  var chips = root.querySelectorAll('.cites .chip');
+  for (var j = 0; j < chips.length; j++){
+    var c = chips[j];
+    if (c.querySelector('.bk')) continue;
+    var t = (c.textContent || '').trim();
+    if (!t) continue;
+    c.textContent = '';
+    c.appendChild(blankBtn(t));
+    stat.n++;
+  }
+}
+function applyMask(root, stat, maxCards){
+  if (!root) return stat;
+  if (maxCards){
+    /* 회독 모드: 400문항을 한 번에 가리면 화면이 무거워지므로 앞쪽 카드만 가린다 */
+    var cards = root.querySelectorAll('.rcard'), done = 0;
+    for (var i = 0; i < cards.length && done < maxCards; i++){ maskZones(cards[i], stat); done++; }
+    stat.capped = cards.length > maxCards ? cards.length : 0;
+    return stat;
+  }
+  maskZones(root, stat);
+  return stat;
+}
+/* 빈칸 탭 → 펼치기 / 다시 가리기 (capture 단계에서 처리해 선지 선택을 막는다) */
+document.addEventListener('click', function(e){
+  var t = e.target;
+  var b = (t && t.closest) ? t.closest('.bk') : null;
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  if (b.classList.contains('on')){ b.textContent = '[ ___ ]'; b.classList.remove('on'); }
+  else { b.textContent = b.getAttribute('data-a') || ''; b.classList.add('on'); }
+}, true);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ③ 📝 문제별 1줄 메모
+   ═══════════════════════════════════════════════════════════════════════════ */
+function memoOf(id){ var v = MEMO[id]; return (typeof v === 'string') ? v : ''; }
+function setMemo(id, txt){
+  if (!id) return;
+  txt = String(txt == null ? '' : txt);
+  if (txt.trim()) MEMO[id] = txt.slice(0, 400); else delete MEMO[id];
+  W(KM, MEMO);
+}
+function addMemo(card, q){
+  if (!q || !q.id || !card) return;
+  if (card.querySelector('.memobox')) return;
+  var box = document.createElement('div');
+  box.className = 'memobox';
+  box.innerHTML = '<div class="mh"><span>📝 내 메모 · ' + esc2(q.roundLabel || '') + '</span>' +
+    '<span class="msave' + (memoOf(q.id) ? ' ok' : '') + '" id="memoSave">' +
+    (memoOf(q.id) ? '저장됨' : '자동 저장') + '</span></div>' +
+    '<textarea id="memoInput" rows="2" maxlength="400" placeholder="이 문제에서 기억할 한 줄 (예: 보관 3년→5년으로 바꾼 지문이 답)"></textarea>' +
+    '<div class="mhint">적는 즉시 이 기기에 저장되고 📄 오답 PDF에 함께 인쇄됩니다.</div>';
+  card.appendChild(box);
+  var ta = box.querySelector('#memoInput');
+  var lab = box.querySelector('#memoSave');
+  ta.value = memoOf(q.id);
+  var tm = 0;
+  function flash(txt, ok){
+    lab.textContent = txt;
+    lab.classList.toggle('ok', !!ok);
+  }
+  ta.addEventListener('input', function(){
+    flash('저장 중…', false);
+    clearTimeout(tm);
+    tm = setTimeout(function(){
+      setMemo(q.id, ta.value);
+      flash('저장됨', true);
+      memoBadge();
+      annotateGrid();
+    }, 320);
+  });
+  ta.addEventListener('blur', function(){
+    clearTimeout(tm);
+    setMemo(q.id, ta.value);
+    flash('저장됨', true);
+    memoBadge();
+    annotateGrid();
+  });
+}
+function memoBadge(){
+  var card = $('card');
+  if (!card || readMode) return;
+  var q = list[cur];
+  if (!q) return;
+  var meta = card.querySelector('.qmeta');
+  if (!meta) return;
+  var has = !!memoOf(q.id);
+  var el = meta.querySelector('.b.memo');
+  if (has && !el){
+    var s = document.createElement('span');
+    s.className = 'b memo';
+    s.textContent = '📝 메모';
+    meta.appendChild(s);
+  } else if (!has && el){ el.parentNode.removeChild(el); }
+}
+function annotateGrid(){
+  var g = $('grid');
+  if (!g) return;
+  var cells = g.querySelectorAll('.gi');
+  for (var i = 0; i < cells.length; i++){
+    var q = list[i];
+    if (!q) continue;
+    var has = !!memoOf(q.id);
+    var el = cells[i].querySelector('.mst');
+    if (has && !el){
+      var s = document.createElement('span');
+      s.className = 'mst';
+      s.textContent = '📝';
+      cells[i].appendChild(s);
+    } else if (!has && el){ el.parentNode.removeChild(el); }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ④ 화면 그리기 뒤처리 — 메모 상자·메모 배지·빈칸 가리기
+   ═══════════════════════════════════════════════════════════════════════════ */
+function blankNote(card, stat){
+  var note = card.querySelector('.modenote');
+  if (note) note.parentNode.removeChild(note);
+  var q = list[cur];
+  var graded = !!(q && state.graded && state.graded[q.id] !== undefined && state.graded[q.id] !== null);
+  var d = document.createElement('div');
+  d.className = 'modenote';
+  d.innerHTML = stat.n
+    ? '🧩 빈칸 암기 — 가려진 <b class="mnum">[ ___ ] ' + stat.n + '개</b>를 누르면 정답이 펼쳐집니다. (풀이·오답 기록은 그대로)'
+    : (graded ? '🧩 이 문항에는 가릴 숫자·조문이 없습니다.'
+              : '🧩 아직 채점 전이라 가릴 해설이 없습니다. 답을 고르면 정답 지문·해설의 숫자가 가려집니다.');
+  var head = card.querySelector('.qhead');
+  if (head && head.nextSibling) card.insertBefore(d, head.nextSibling);
+  else card.insertBefore(d, card.firstChild);
+}
+function afterRender(){
+  if (exOn()) return;
+  var card = $('card');
+  if (!card) return;
+  if (readMode){
+    if (BLANK){
+      var st = {n: 0};
+      applyMask(card, st, 120);
+      var old = card.querySelector('.modenote');
+      if (old) old.parentNode.removeChild(old);
+      var d = document.createElement('div');
+      d.className = 'modenote';
+      d.innerHTML = '🧩 빈칸 암기 — 가려진 <b class="mnum">[ ___ ] ' + st.n + '개</b>를 누르면 정답이 펼쳐집니다.' +
+        (st.capped ? ' 회독 모드는 앞 120문항까지만 가립니다(단원을 좁히면 그 단원 전부).' : '');
+      card.insertBefore(d, card.firstChild);
+    }
+  } else {
+    var q = list[cur];
+    addMemo(card, q);
+    memoBadge();
+    if (BLANK){
+      var s2 = {n: 0};
+      applyMask(card, s2);
+      blankNote(card, s2);
+    }
+  }
+  annotateGrid();
+  syncBtns();
+}
+function safeAfter(){ try { afterRender(); } catch(e){} }
+
+/* 기존 그리기 함수는 그대로 두고 뒤처리만 덧붙인다 (레이더·모의고사 래퍼와도 충돌 없음) */
+var _render = window.render, _renderRead = window.renderRead, _renderGrid = window.renderGrid;
+if (typeof _render === 'function') window.render = function(){
+  var r = _render.apply(this, arguments); safeAfter(); return r; };
+if (typeof _renderRead === 'function') window.renderRead = function(){
+  var r = _renderRead.apply(this, arguments); safeAfter(); return r; };
+if (typeof _renderGrid === 'function') window.renderGrid = function(){
+  var r = _renderGrid.apply(this, arguments); try { annotateGrid(); } catch(e){} return r; };
+
+/* 빈칸 암기 중에는 형광펜을 켜지 못하게 한다(가린 글자 위에 칠하면 자리 계산이 어긋난다) */
+document.addEventListener('click', function(e){
+  if (!BLANK) return;
+  var t = e.target;
+  if (!t || !t.closest || !t.closest('#btnHL')) return;
+  e.preventDefault(); e.stopPropagation();
+  say('🧩 빈칸 암기 중에는 형광펜을 쓸 수 없습니다. 빈칸 암기를 끄고 칠하세요.', 2600);
+}, true);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑤ ⚡ 지문 O/X 쪼개기 스피드 퀴즈 (연습용 — 기록 불변)
+   ═══════════════════════════════════════════════════════════════════════════ */
+var OX = {on: false, items: [], i: 0, ans: '', right: 0, wrong: 0, done: false};
+
+function oxPool(){
+  var out = [];
+  for (var i = 0; i < list.length; i++){
+    var q = list[i];
+    if (!q || q.combo || q.short || q.noAns) continue;
+    var cs = q.choices || [];
+    for (var j = 0; j < cs.length; j++){
+      var c = cs[j];
+      if (!c || !c.text) continue;
+      var mk = c.mark || (c.ans ? 'O' : 'X');
+      out.push({q: q, c: c, t: (mk === 'O' ? 'O' : 'X')});
+    }
+  }
+  return out;
+}
+function oxNextLabel(){
+  var it = OX.items[OX.i], nx = OX.items[OX.i + 1];
+  if (!nx) return '결과 보기 →';
+  return (nx.q.id === it.q.id) ? '다음 지문 →' : '다음 문항 →';
+}
+function oxFb(it){
+  if (!OX.ans) return '<div class="oxfb"></div>';
+  var ok = OX.ans === it.t;
+  var note = it.c.note || it.q.core || '';
+  return '<div class="oxfb show ' + (ok ? 'ok' : 'no') + '">' +
+    '<span class="oxans">' + (ok ? '⭕ 정답' : '❌ 틀렸습니다') + ' — 이 지문은 <b>' +
+      (it.t === 'O' ? 'O (옳음)' : 'X (틀림)') + '</b></span>' +
+    (ok ? '' : '<span style="font-weight:800">내 답 ' + esc2(OX.ans) + '</span> · ') +
+    '<span style="font-weight:800">' + esc2(it.q.roundLabel || '') + ' ' + esc2(it.c.n) + '</span>' +
+    (note ? '<div class="oxnote">' + esc2(note.slice(0, 400)) + (note.length > 400 ? '…' : '') + '</div>'
+          : '<div class="oxnote">이 지문에는 따로 적힌 해설이 없습니다.</div>') +
+    '</div>';
+}
+function oxRender(){
+  var p = $('oxPanel');
+  if (!p || !OX.on) return;
+  if (OX.done){
+    p.innerHTML = '<div class="oxhd"><span class="oxt">⚡ 지문 O/X</span>' +
+      '<span class="oxsub">' + esc2(brandName()) + '</span>' +
+      '<button type="button" class="oxx" id="oxClose">닫기</button></div>' +
+      '<div class="oxbody"><div class="oxfb show ok" style="display:block">' +
+      '<span class="oxans">🏁 ' + (OX.right + OX.wrong) + '지문 완료 — 맞힘 ' + OX.right +
+      ' · 틀림 ' + OX.wrong + '</span>' +
+      '<div class="oxnote">정답률 ' + Math.round(OX.right / Math.max(1, OX.right + OX.wrong) * 100) +
+      '% · 이 퀴즈는 연습이라 풀이·오답 기록은 그대로입니다.</div></div></div>' +
+      '<div class="oxfoot"><span class="oxscore">맞힘 ' + OX.right + ' · 틀림 ' + OX.wrong + '</span>' +
+      '<button type="button" class="oxnext" id="oxAgain">다시 하기</button>' +
+      '<button type="button" class="oxnext" id="oxOut" style="background:#fff;color:#0f6b57">나가기</button></div>';
+    var c = $('oxClose'); if (c) c.onclick = closeOx;
+    var a = $('oxAgain'); if (a) a.onclick = function(){ OX.done = false; OX.i = 0; OX.ans = ''; OX.right = 0; OX.wrong = 0; oxRender(); };
+    var o = $('oxOut'); if (o) o.onclick = closeOx;
+    return;
+  }
+  var it = OX.items[OX.i];
+  if (!it){ OX.done = true; oxRender(); return; }
+  var total = OX.items.length;
+  var pct = total ? Math.round(OX.i / total * 100) : 0;
+  var stem = String(it.q.stem || '');
+  p.innerHTML =
+    '<div class="oxhd"><span class="oxt">⚡ 지문 O/X</span>' +
+      '<span class="oxsub">' + esc2(brandName()) + ' · ' + (OX.i + 1) + '/' + total + '</span>' +
+      '<button type="button" class="oxx" id="oxClose">닫기</button></div>' +
+    '<div class="oxprog"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="oxbody">' +
+      '<div class="oxq"><span class="oxqn">' + esc2(it.q.roundLabel || '') + '</span>' +
+        esc2(it.q.unit || it.q.part || '') + '</div>' +
+      '<div class="oxq" style="margin-top:-6px">' + esc2(stem.slice(0, 120)) + (stem.length > 120 ? '…' : '') + '</div>' +
+      '<div class="oxchoice"><span class="oxcno">' + esc2(it.c.n) + '</span>' + esc2(it.c.text) + '</div>' +
+      '<div class="oxbtns">' +
+        '<button type="button" class="oxb o' + (OX.ans === 'O' ? ' sel' : '') + '" data-ox="O"' + (OX.ans ? ' disabled' : '') + '>O 옳다</button>' +
+        '<button type="button" class="oxb x' + (OX.ans === 'X' ? ' sel' : '') + '" data-ox="X"' + (OX.ans ? ' disabled' : '') + '>X 틀리다</button>' +
+      '</div>' + oxFb(it) +
+    '</div>' +
+    '<div class="oxfoot"><span class="oxscore">맞힘 ' + OX.right + ' · 틀림 ' + OX.wrong + '</span>' +
+      '<button type="button" class="oxnext" id="oxNext"' + (OX.ans ? '' : ' disabled') + '>' + oxNextLabel() + '</button>' +
+    '</div>';
+  var c2 = $('oxClose'); if (c2) c2.onclick = closeOx;
+  var bs = p.querySelectorAll('.oxb');
+  for (var i = 0; i < bs.length; i++){
+    bs[i].onclick = function(){ oxAnswer(this.getAttribute('data-ox')); };
+  }
+  var nx = $('oxNext'); if (nx) nx.onclick = oxNext;
+}
+function oxAnswer(v){
+  if (!OX.on || OX.done || OX.ans) return;
+  var it = OX.items[OX.i];
+  if (!it) return;
+  OX.ans = v;
+  if (v === it.t) OX.right++; else OX.wrong++;
+  oxRender();
+}
+function oxNext(){
+  if (!OX.on || !OX.ans) return;
+  OX.i++;
+  OX.ans = '';
+  if (OX.i >= OX.items.length){ OX.done = true; }
+  oxRender();
+}
+function openOx(){
+  if (exOn()) return;
+  var pool = oxPool();
+  if (!pool.length){ say('⚡ 이 조건에는 O/X로 풀 선지가 없습니다(서술형·보기 조합 문항 제외).', 2800); return; }
+  var curId = (list[cur] || {}).id, start = 0;
+  for (var i = 0; i < pool.length; i++){ if (pool[i].q.id === curId){ start = i; break; } }
+  OX.items = pool.slice(start);
+  OX.i = 0; OX.ans = ''; OX.right = 0; OX.wrong = 0; OX.done = false; OX.on = true;
+  document.body.classList.add('oxopen');
+  oxRender();
+  try { var p = $('oxPanel'); if (p) p.scrollTop = 0; } catch(e){}
+}
+function closeOx(){
+  OX.on = false; OX.done = false;
+  document.body.classList.remove('oxopen');
+}
+var _oxBack = $('oxBack');
+if (_oxBack) _oxBack.onclick = closeOx;
+
+/* O/X 퀴즈 중에는 키보드가 뒤 화면 문항을 움직이지 않게 한다 */
+document.addEventListener('keydown', function(e){
+  if (!OX.on) return;
+  var t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+  var k = e.key;
+  if (k === 'Escape'){ e.preventDefault(); e.stopPropagation(); closeOx(); return; }
+  if (k === 'ArrowRight' || k === 'Enter'){ e.preventDefault(); e.stopPropagation(); if (OX.ans) oxNext(); return; }
+  if (k === 'o' || k === 'O' || k === '1'){ e.preventDefault(); e.stopPropagation(); oxAnswer('O'); return; }
+  if (k === 'x' || k === 'X' || k === '2'){ e.preventDefault(); e.stopPropagation(); oxAnswer('X'); return; }
+}, true);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑥ 📄 내 오답노트 PDF (A4 인쇄 · 미졸업 오답 + 내 메모 + 정답·해설)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function activeWrongs(){ return DATA.filter(function(q){ return isWrongActive(q.id); }); }
+function pdfHtml(){
+  var wr = activeWrongs();
+  wr.sort(function(a, b){
+    var ua = (a.part || '') + '\u0001' + (a.unit || ''), ub = (b.part || '') + '\u0001' + (b.unit || '');
+    if (ua !== ub) return ua < ub ? -1 : 1;
+    if ((a.round || 0) !== (b.round || 0)) return (a.round || 0) - (b.round || 0);
+    return (a.num || 0) - (b.num || 0);
+  });
+  var n1 = 0, n2 = 0, n3 = 0, memoN = 0;
+  wr.forEach(function(q){
+    var lv = Math.min(3, mistakes[q.id] || 0);
+    if (lv <= 1) n1++; else if (lv === 2) n2++; else n3++;
+    if (memoOf(q.id)) memoN++;
+  });
+  var d = new Date();
+  var ds = d.getFullYear() + '.' + (d.getMonth() + 1) + '.' + d.getDate();
+  var items = '', lastUnit = null;
+  wr.forEach(function(q, i){
+    var lv = Math.min(3, mistakes[q.id] || 0);
+    var unit = (q.part ? q.part + ' · ' : '') + (q.unit || '');
+    if (unit !== lastUnit){
+      items += '<div class="punit">' + esc2(unit) + '</div>';
+      lastUnit = unit;
+    }
+    var keyC = null, cs = q.choices || [];
+    for (var k = 0; k < cs.length; k++){ if (cs[k].ans){ keyC = cs[k]; break; } }
+    var ans = keyC ? (keyC.n + '  ' + keyC.text)
+                   : (q.short ? ((q.blanks || []).join(' / ') || q.ansText || '—') : (q.ansText || '—'));
+    var exp = q.core || (keyC && keyC.note ? keyC.note : '');
+    var memo = memoOf(q.id);
+    items += '<div class="pdfitem">' +
+      '<div class="ph"><span class="no">' + (i + 1) + '.</span>' +
+        '<span>' + esc2(q.roundLabel || '') + '</span>' +
+        '<span class="pstar">' + new Array(lv + 1).join('★') + ' (' + lv + '회)</span>' +
+        (q.diff ? '<span>난이도 ' + esc2(q.diff) + '</span>' : '') +
+        (memo ? '<span>📝 메모</span>' : '') + '</div>' +
+      '<div class="pstem">' + esc2(q.stem || '') + '</div>' +
+      '<div class="pans"><span class="l">정답</span>' + esc2(ans) + '</div>' +
+      (memo ? '<div class="pmemo">📝 ' + esc2(memo) + '</div>' : '') +
+      (exp ? '<div class="pexp">' + esc2(exp) + '</div>' : '') +
+    '</div>';
+  });
+  return '<div class="pdfbar">' +
+      '<span class="pt">📄 내 오답노트</span>' +
+      '<span class="pcount">' + esc2(brandName()) + ' · ' + wr.length + '문항</span>' +
+      '<button type="button" class="pbtn go" id="pPrint">🖨 인쇄 · PDF 저장</button>' +
+      '<button type="button" class="pbtn" id="pClose">닫기</button>' +
+    '</div>' +
+    '<div class="pdfsheet">' +
+      '<h1>' + esc2(brandName()) + ' — 내 오답노트</h1>' +
+      '<div class="pmeta">' + ds + ' 출력 · 대상: 아직 졸업하지 않은 오답 <b>' + wr.length + '문항</b>' +
+        (memoN ? ' (메모 ' + memoN + '문항)' : '') + ' · 기기 저장 기록 기준<br>' +
+        '★ = 틀린 횟수(남은 오답만, 3회에서 자름) · 정답과 해설은 현재 문제집 기준</div>' +
+      '<div class="pstars">★ 1회 ' + n1 + ' · ★★ 2회 ' + n2 + ' · ★★★ 3회+ ' + n3 +
+        ' · 오답을 두 번 연속 맞히면 🎓 졸업해 이 노트에서 빠집니다.</div>' +
+      (wr.length ? items : '<div class="pdfempty">아직 남은 오답이 없습니다.<br>' +
+        '문제를 풀어 틀린 문항이 생기면 여기에 정답·해설·내 메모가 함께 인쇄됩니다.</div>') +
+      '<div class="pdffoot">주택관리사보 CBT · 개인 학습용</div>' +
+    '</div>';
+}
+function openPdf(){
+  if (exOn()) return;
+  var v = $('pdfview');
+  if (!v) return;
+  v.innerHTML = pdfHtml();
+  document.body.classList.add('pdfopen');
+  var b1 = $('pPrint'), b2 = $('pClose');
+  if (b1) b1.onclick = function(){ try { window.print(); } catch(e){} };
+  if (b2) b2.onclick = closePdf;
+  window.scrollTo(0, 0);
+  setTimeout(function(){ try { window.print(); } catch(e){} }, 400);
+}
+function closePdf(){
+  document.body.classList.remove('pdfopen');
+  var v = $('pdfview');
+  if (v) v.innerHTML = '';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑦ 버튼 상태·연결
+   ═══════════════════════════════════════════════════════════════════════════ */
+function syncBtns(){
+  var by = $('btnY3');
+  if (by){
+    by.classList.toggle('on', Y3);
+    by.setAttribute('aria-pressed', Y3 ? 'true' : 'false');
+    by.innerHTML = '<span class="nic">🔥</span><span class="nlbl">최근 3개년' + (Y3 ? ' ✓' : '') +
+      '</span><span class="ns">3개년</span>';
+  }
+  var bb = $('btnBlank');
+  if (bb){
+    bb.classList.toggle('on', BLANK);
+    bb.setAttribute('aria-pressed', BLANK ? 'true' : 'false');
+    bb.innerHTML = '<span class="nic">🧩</span><span class="nlbl">빈칸 암기' + (BLANK ? ' ✓' : '') +
+      '</span><span class="ns">빈칸</span>';
+  }
+  var bo = $('btnOX');
+  if (bo){
+    bo.classList.toggle('on', OX.on);
+    bo.setAttribute('aria-pressed', OX.on ? 'true' : 'false');
+    bo.innerHTML = '<span class="nic">⚡</span><span class="nlbl">O/X 퀴즈</span><span class="ns">O/X</span>';
+  }
+  var bp = $('btnPDF');
+  if (bp){
+    var n = 0;
+    try { n = activeWrongs().length; } catch(e){ n = 0; }
+    bp.innerHTML = '<span class="nic">📄</span><span class="nlbl">오답 PDF' + (n ? ' · ' + n : '') +
+      '</span><span class="ns">PDF' + (n ? ' ' + n : '') + '</span>';
+  }
+}
+function setY3(v){
+  Y3 = !!v;
+  W(KY, Y3);
+  if (readMode){ try { clearTimeout(readPosTimer); saveReadPos(); } catch(e){} }
+  closeOx();
+  try { buildSelectors(); rebuild(); } catch(e){ safeAfter(); }
+  syncBtns();
+  say(Y3 ? '🔥 최근 3개년(27·28·29회)만 — 이 조건 ' + list.length + '문항'
+         : '🔥 최근 3개년 필터를 껐습니다 — 이 조건 ' + list.length + '문항', 2400);
+}
+function setBlank(v){
+  BLANK = !!v;
+  W(KB, BLANK);
+  document.body.classList.toggle('blankmode', BLANK);
+  if (BLANK){
+    try {
+      if (typeof hlOn !== 'undefined' && hlOn){
+        hlOn = false;
+        W(LS + '_hlon', false);
+        document.body.classList.remove('hlmode');
+      }
+    } catch(e){}
+  }
+  try { rebuild(); } catch(e){ safeAfter(); }
+  syncBtns();
+  say(BLANK ? '🧩 빈칸 암기 — 가려진 [ ___ ]를 눌러 정답을 확인하세요.'
+            : '🧩 빈칸 암기를 껐습니다 — 원래 지문으로 돌아왔습니다.', 2400);
+}
+
+var by2 = $('btnY3');    if (by2) by2.onclick = function(){ setY3(!Y3); };
+var bb2 = $('btnBlank'); if (bb2) bb2.onclick = function(){ setBlank(!BLANK); };
+var bo2 = $('btnOX');    if (bo2) bo2.onclick = openOx;
+var bp2 = $('btnPDF');   if (bp2) bp2.onclick = openPdf;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⑧ 시작 — 저장된 모드 복원
+   ═══════════════════════════════════════════════════════════════════════════ */
+document.body.classList.toggle('blankmode', BLANK);
+syncBtns();
+try {
+  if (Y3){ buildSelectors(); rebuild(); }
+  else { safeAfter(); }
+} catch(e){ safeAfter(); }
+
+/* 점검용 손잡이 */
+window.__cbtFull = {
+  y3: y3hit, getY3: function(){ return Y3; }, setY3: setY3,
+  getBlank: function(){ return BLANK; }, setBlank: setBlank,
+  memo: function(id){ return memoOf(id); }, setMemo: setMemo, memoAll: function(){ return MEMO; },
+  openOx: openOx, closeOx: closeOx, ox: OX, oxAnswer: oxAnswer, oxNext: oxNext,
+  openPdf: openPdf, closePdf: closePdf, pdfHtml: pdfHtml,
+  activeWrongs: activeWrongs, afterRender: safeAfter,
+  state: function(){ return {y3: Y3, blank: BLANK, memoN: Object.keys(MEMO).length,
+                             listN: (typeof list !== 'undefined' && list) ? list.length : -1}; }
+};
 })();
 
 </script>
