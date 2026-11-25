@@ -252,6 +252,159 @@ body.readmode .progtxt{font-size:11.5px}
   body.readmode .modetabs .mtab .cnt{display:none}   /* 회독 중에는 칩 숫자를 빼 한 줄에 다 들어오게 */
   body.readmode .readtab{margin-left:6px;margin-top:0;flex:0 0 auto;padding:5px 8px;font-size:11.5px}
 }
+
+/* ═══ 2026-11-25 📊 약점 레이더 · ⏱️ 실전 모의고사 ═══════════════════════════ */
+.readtab.radartab{border-color:#b6c4ea;color:#243a7a;background:#f7f9ff}
+.readtab.radartab:active{background:#eef2fb}
+.readtab.examtab{border-color:#e6cba4;color:#7a4a10;background:#fffaf2}
+.readtab.examtab:active{background:#fdf3e4}
+.readtab .ric{font-size:14px;line-height:1}
+@media (max-width:430px){
+  .readtab.radartab,.readtab.examtab{margin-left:0;margin-top:4px;flex:1 1 calc(50% - 3px);justify-content:center;padding:5px 6px;font-size:12px}
+  body.readmode .readtab.radartab,body.readmode .readtab.examtab{flex:0 0 auto;margin-left:6px;margin-top:0;padding:5px 8px;font-size:11.5px}
+  body.readmode .readtab .rlbl{display:none}
+}
+
+/* ── 📊 약점 레이더 패널 ─────────────────────────────────────────────────── */
+.radarback{position:fixed;inset:0;background:rgba(10,18,32,.48);z-index:62;display:none}
+body.radaropen .radarback{display:block}
+body.radaropen{overflow:hidden}
+.radarpanel{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(820px,100%);
+  max-height:88vh;background:#fff;border-radius:18px 18px 0 0;z-index:63;display:none;
+  flex-direction:column;box-shadow:0 -10px 34px rgba(0,0,0,.32);overflow:hidden}
+body.radaropen .radarpanel{display:flex}
+.rhd{display:flex;align-items:center;gap:10px;padding:13px 15px 11px;border-bottom:1px solid var(--line);
+  background:#f7f9fc;flex:0 0 auto}
+.rhd .rt{font-size:17px;font-weight:900;color:var(--navy);white-space:nowrap}
+.rhd .rsub{font-size:12px;color:var(--muted);font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rx{margin-left:auto;appearance:none;border:1px solid #cfd6e2;background:#fff;color:#33405a;border-radius:9px;
+  padding:6px 11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;flex:0 0 auto}
+.rsum{display:flex;gap:8px;flex-wrap:wrap;padding:11px 15px 4px;flex:0 0 auto}
+.rchip{border:1px solid #dfe4ec;background:#f8fafd;border-radius:10px;padding:7px 11px;font-size:12.5px;
+  font-weight:800;color:#33405a;font-variant-numeric:tabular-nums;line-height:1.35}
+.rchip b{font-size:15px;color:var(--navy)}
+.rchip.good{border-color:#bfe3cc;background:#eaf7ef;color:#1f6b41}
+.rchip.bad{border-color:#f3c9c4;background:#fdeeec;color:#a8382f}
+.rtools{display:flex;gap:6px;align-items:center;padding:7px 15px 3px;flex:0 0 auto;flex-wrap:wrap}
+.rsort{appearance:none;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:99px;
+  padding:5px 11px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.rsort.on{background:var(--navy2);border-color:var(--navy2);color:#fff}
+.rlegend{font-size:11.5px;color:var(--muted);font-weight:700;margin-left:auto}
+.rlist{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 12px 20px}
+.rrow{display:block;width:100%;text-align:left;appearance:none;border:1px solid var(--line);background:#fff;
+  border-radius:12px;padding:9px 12px 8px;margin:0 0 7px;cursor:pointer;font-family:inherit}
+.rrow:active{background:#f3f6fc}
+.rrow.lv2{margin-left:16px;width:calc(100% - 16px);border-style:dashed;background:#fcfdff}
+.rline{display:flex;align-items:baseline;gap:8px}
+.rname{flex:1 1 auto;min-width:0;font-size:14.5px;font-weight:800;color:#1b2536;line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rpart{flex:0 0 auto;font-size:10.5px;font-weight:800;color:#6b7787;background:#eef1f7;border-radius:6px;padding:2px 6px}
+.rpct{flex:0 0 auto;font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;color:#1f6b41}
+.rpct.mid{color:#8a6100} .rpct.low{color:#a8382f} .rpct.none{color:#98a2b3;font-size:13px}
+.rbar{height:7px;border-radius:99px;background:#e6eaf2;overflow:hidden;margin:6px 0 5px}
+.rbar i{display:block;height:100%;background:#1f6b41;border-radius:99px}
+.rbar i.mid{background:#d9a400} .rbar i.low{background:#c4443a}
+.rmeta{font-size:11.5px;font-weight:700;color:#6b7787;font-variant-numeric:tabular-nums}
+.rmeta b{color:#33405a}
+@media (max-width:430px){
+  .rhd{padding:11px 12px 9px}.rhd .rt{font-size:15.5px}
+  .rsum{padding:9px 12px 2px;gap:6px}.rchip{padding:6px 9px;font-size:11.5px}
+  .rtools{padding:6px 12px 2px}.rlegend{display:none}
+  .rlist{padding:6px 9px 18px}
+  .rname{font-size:13.5px}.rpct{font-size:14px}
+}
+
+/* ── ⏱️ 실전 모의고사 상단 바(.stickyhead 안에 들어가 겹침 0) ──────────────── */
+.examrow{display:none;background:var(--navy);border-bottom:1px solid #0c2b4a;color:#fff}
+body.exammode .examrow{display:block}
+body.exammode .selrow{display:none}
+body.exammode #btnList{display:none}
+body.exammode .drawer{display:none}
+.exin{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:7px;padding:6px 12px;flex-wrap:wrap}
+.exclock{font-variant-numeric:tabular-nums;font-weight:900;font-size:18px;letter-spacing:.6px;
+  background:rgba(255,255,255,.14);border-radius:8px;padding:3px 10px;min-width:74px;text-align:center}
+.exclock.warn{background:#a8382f}
+.excnt{font-size:13px;font-weight:800;color:#cfe0f5;font-variant-numeric:tabular-nums;white-space:nowrap}
+.exsp{display:none;font-size:12px;font-weight:800;color:#ffd27a;white-space:nowrap}
+body.exampaused .exsp{display:inline}
+.exspacer{flex:1 1 auto;min-width:0}
+.exbtn{appearance:none;border:1px solid rgba(255,255,255,.34);background:rgba(255,255,255,.1);color:#fff;
+  border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:800;cursor:pointer;white-space:nowrap;
+  font-family:inherit;line-height:1.3}
+.exbtn:active{background:rgba(255,255,255,.24)}
+.exbtn.go{background:#1f6b41;border-color:#1f6b41}
+.exbtn.out{background:transparent;border-color:rgba(255,255,255,.45);color:#e6eef8}
+@media (max-width:430px){
+  .exin{padding:5px 9px;gap:5px}
+  .exclock{font-size:16px;min-width:64px;padding:2px 8px}
+  .excnt{font-size:11.5px}
+  .exbtn{padding:5px 8px;font-size:11.5px}
+}
+
+/* ── 모의고사 문제·결과 화면 ─────────────────────────────────────────────── */
+#card.examcard{position:relative}
+.expause{position:absolute;inset:0;background:rgba(240,244,250,.93);z-index:9;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:16px;
+  font-size:20px;font-weight:900;color:var(--navy);text-align:center;padding:30px 20px}
+.expause .pbtn{appearance:none;border:1px solid var(--navy2);background:var(--navy2);color:#fff;
+  border-radius:12px;padding:12px 24px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit}
+.exnav{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.exnav .btn{appearance:none;border:1px solid #cfd6e2;background:#fff;border-radius:12px;padding:11px 18px;
+  font-size:15px;font-weight:700;color:#22314c;cursor:pointer;font-family:inherit}
+.exnav .btn.primary{border-color:var(--navy2);background:var(--navy2);color:#fff}
+.exnav .btn:disabled{opacity:.45;cursor:default}
+.exnum{font-size:14px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:auto}
+.exgrid{display:none;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:12px}
+.exgrid.open{display:grid}
+.exgrid .cell{appearance:none;border:1px solid #dbe2ee;background:#fff;border-radius:8px;padding:7px 0;
+  font-size:13px;font-weight:800;color:#33405a;cursor:pointer;font-family:inherit;font-variant-numeric:tabular-nums}
+.exgrid .cell.on{background:#dbe7f6;border-color:var(--navy2);color:var(--navy)}
+.exgrid .cell.cur{box-shadow:0 0 0 2px rgba(29,79,128,.35)}
+@media (max-width:430px){.exgrid{grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+  .exgrid .cell{font-size:12px;padding:6px 0}}
+
+/* 결과 */
+.exres .exscore{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.exres .big{font-size:46px;font-weight:900;color:var(--navy);line-height:1.05;font-variant-numeric:tabular-nums}
+.exres .big span{font-size:19px;font-weight:800;color:#6b7787;margin-left:3px}
+.exres .verdict{border-radius:99px;padding:7px 14px;font-size:14px;font-weight:900}
+.exres .verdict.pass{background:#eaf7ef;color:#1f6b41;border:1px solid #bfe3cc}
+.exres .verdict.fail{background:#fdeeec;color:#a8382f;border:1px solid #f3c9c4}
+.exres .exmeta{margin-top:10px;font-size:14px;font-weight:700;color:#33405a;line-height:1.7}
+.exres .exmeta b{color:var(--navy);font-variant-numeric:tabular-nums}
+.excrit{margin-top:8px;font-size:12.5px;font-weight:700;color:#6b7787;line-height:1.6;
+  border-top:1px dashed #dfe4ec;padding-top:8px}
+.exsheet{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin:12px 0 4px}
+.exsheet .sc{appearance:none;border:1px solid #dbe2ee;background:#fff;border-radius:8px;padding:8px 0;
+  font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;line-height:1.25;font-variant-numeric:tabular-nums}
+.exsheet .sc.o{background:#eaf7ef;border-color:#bfe3cc;color:#1f6b41}
+.exsheet .sc.x{background:#fdeeec;border-color:#f3c9c4;color:#a8382f}
+.exsheet .sc.n{background:#f3f5f9;border-color:#dbe2ee;color:#8a94a6}
+.exwlist{margin-top:14px}
+.exw{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.exw .exwh{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.exw .exwn{font-size:16px;font-weight:900;color:var(--navy)}
+.exw .exwtag{font-size:11.5px;font-weight:900;border-radius:7px;padding:2px 7px}
+.exw .exwtag.x{background:#fdeeec;color:#a8382f;border:1px solid #f3c9c4}
+.exw .exwtag.n{background:#f3f5f9;color:#6b7787;border:1px solid #dbe2ee}
+.exw .exwstem{font-size:15px;font-weight:700;line-height:1.5;color:#1b2536;margin:4px 0 8px}
+.exw .exwans{font-size:14px;font-weight:800;color:#1f6b41;background:#eaf7ef;border-radius:9px;padding:7px 10px;line-height:1.5}
+.exw .exwcore{font-size:13.5px;line-height:1.6;color:#1b2536;margin-top:8px}
+.exw .exwnote{font-size:13px;line-height:1.55;color:#33405a;margin-top:6px;border-top:1px dashed #e2e8f2;padding-top:6px}
+.exw.ok{border-color:#bfe3cc}
+.exallok{margin-top:14px;border:1px solid #bfe3cc;background:#eaf7ef;border-radius:12px;padding:14px;
+  font-weight:800;color:#1f6b41}
+.exres .exbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.exres .exbtns .btn{appearance:none;border:1px solid #cfd6e2;background:#fff;border-radius:12px;padding:12px 20px;
+  font-size:15px;font-weight:800;color:#22314c;cursor:pointer;font-family:inherit}
+.exres .exbtns .btn.primary{border-color:var(--navy2);background:var(--navy2);color:#fff}
+@media (max-width:430px){
+  .exres .big{font-size:38px}
+  .exsheet{grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+  .exsheet .sc{font-size:12px;padding:7px 0}
+  .exw{padding:10px 11px}.exw .exwstem{font-size:14px}
+}
+
 </style>
 </head>
 <body>
@@ -273,7 +426,19 @@ body.readmode .progtxt{font-size:11.5px}
     <select id="selChapter" title="CHAPTER — 교재 목차"></select>
     <select id="selUnit" title="세부 단원"></select>
     <select id="selView" title="보기 범위"></select>
-    <button type="button" class="readtab" id="btnRead" aria-pressed="false" title="이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다">📖 회독 모드</button>
+    <button type="button" class="readtab" id="btnRead" aria-pressed="false" title="이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다">📖 회독 모드</button><button type="button" class="readtab radartab" id="btnRadar" title="단원별 정답률·남은 오답을 한눈에 보고 취약 단원으로 바로 이동합니다"><span class="ric">📊</span><span class="rlbl">약점 레이더</span></button><button type="button" class="readtab examtab" id="btnExam" title="객관식 40문항 · 50분 실전 모의고사 (단원 학습 기록은 건드리지 않습니다)"><span class="ric">⏱️</span><span class="rlbl">모의고사</span></button>
+  </div>
+</div>
+
+<div class="examrow" id="examBar">
+  <div class="exin">
+    <span class="exclock" id="exClock">50:00</span>
+    <span class="excnt" id="exCnt">0/40</span>
+    <span class="exsp">일시정지</span>
+    <span class="exspacer"></span>
+    <button type="button" class="exbtn" id="exPause">⏸ 일시정지</button>
+    <button type="button" class="exbtn go" id="exSubmit">제출하기</button>
+    <button type="button" class="exbtn out" id="exExit">나가기</button>
   </div>
 </div>
 </div>
@@ -1464,6 +1629,602 @@ if (readMode) {
   window.addEventListener('orientationchange', function(){ setTimeout(set, 250); });
   if (window.ResizeObserver) { try { new ResizeObserver(set).observe(el); } catch (e) {} }
 })();
+</script>
+
+<div class="radarback" id="radarBack"></div>
+<div class="radarpanel" id="radarPanel"></div>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   📊 단원별 약점 레이더 · ⏱️ 실전 모의고사   (2026-11-25 추가)
+   ─ 기존 채점·오답·형광펜·회독·동기화 기록은 읽기만 하고 건드리지 않는다.
+   ─ 모의고사 답안은 메모리에만 둔다 → 단원 학습 기록(state·mistakes·marks…) 불변.
+   ─ 종료하면 원래 보던 단원 학습 화면(단원·문제·회독 상태)으로 그대로 돌아간다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+var HAS_CH   = !!(META.chapters && META.chapters.length);   /* 회계원리: PART→CHAPTER→세부 단원 */
+var EXAM_N   = 40;      /* 모의고사 문항 수 */
+var EXAM_SEC = 3000;    /* 50분 */
+var PASS_SEC  = 40;     /* 과락 기준 40점 */
+var PASS_LINE = 60;     /* 합격 기준 60점 */
+
+function $(id){ return document.getElementById(id); }
+function fmtT(sec){
+  sec = Math.max(0, Math.round(sec));
+  var m = Math.floor(sec / 60), s = sec % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ① 📊 약점 레이더
+   ═══════════════════════════════════════════════════════════════════════════ */
+var RLEVEL = 1;          /* 1 = 큰 단원(CHAPTER/단원), 2 = 세부 단원 */
+var RSORT  = 'weak';     /* weak = 취약순, book = 교재순 */
+
+function qStat(qs){
+  var total = 0, done = 0, right = 0, wrongLeft = 0, marked = 0;
+  for (var i = 0; i < qs.length; i++){
+    var q = qs[i]; total++;
+    var g = state.graded[q.id];
+    if (g === true || g === false){ done++; if (g === true) right++; }
+    if (isWrongActive(q.id)) wrongLeft++;
+    if (marks[q.id]) marked++;
+  }
+  return {total: total, done: done, right: right, wrongLeft: wrongLeft, marked: marked,
+          acc: done ? Math.round(right / done * 100) : null};
+}
+function radarGroups(){
+  var out = [];
+  if (HAS_CH){
+    META.chapters.forEach(function(ch){
+      out.push({part: ch.part, name: ch.name, kids: (ch.units || []).slice()});
+    });
+  } else {
+    META.units.forEach(function(u){
+      out.push({part: u.part, name: u.name, kids: (u.subs || []).map(function(s){ return s.name; })});
+    });
+  }
+  return out;
+}
+function hasKids(){
+  var gs = radarGroups();
+  for (var i = 0; i < gs.length; i++){ if (gs[i].kids.length) return true; }
+  return false;
+}
+function inGroup(q, g){ return q.part === g.part && (HAS_CH ? q.chapter === g.name : q.unit === g.name); }
+function inKid(q, g, k){ return inGroup(q, g) && (HAS_CH ? q.unit === k : q.sub === k); }
+
+function radarRows(){
+  var rows = [], groups = radarGroups(), i, j;
+  if (RLEVEL === 1 || !hasKids()){
+    for (i = 0; i < groups.length; i++){
+      var g = groups[i];
+      var qs = DATA.filter(function(q){ return inGroup(q, g); });
+      if (!qs.length) continue;
+      rows.push({part: g.part, name: g.name, g: g, kid: '', st: qStat(qs)});
+    }
+  } else {
+    for (i = 0; i < groups.length; i++){
+      var g2 = groups[i];
+      for (j = 0; j < g2.kids.length; j++){
+        var k = g2.kids[j];
+        var qs2 = DATA.filter(function(q){ return inKid(q, g2, k); });
+        if (!qs2.length) continue;
+        rows.push({part: g2.part, name: k, g: g2, kid: k, st: qStat(qs2)});
+      }
+    }
+  }
+  if (RSORT === 'weak'){
+    rows.sort(function(a, b){
+      var A = a.st, B = b.st;
+      if (A.acc === null && B.acc === null) return B.total - A.total;
+      if (A.acc === null) return 1;
+      if (B.acc === null) return -1;
+      if (A.acc !== B.acc) return A.acc - B.acc;          /* 정답률 낮은 단원 먼저 */
+      if (A.wrongLeft !== B.wrongLeft) return B.wrongLeft - A.wrongLeft;  /* 남은 오답 많은 순 */
+      return B.done - A.done;
+    });
+  }
+  return rows;
+}
+
+function renderRadar(){
+  var rows = radarRows();
+  var all = qStat(DATA);
+  var last = null;
+  try { last = readJSON(LS + '_examlast', null); } catch (e){ last = null; }
+
+  var sum = '<div class="rsum">' +
+    '<span class="rchip">전체 정답률 <b>' + (all.acc === null ? '—' : all.acc + '%') + '</b></span>' +
+    '<span class="rchip">푼 문항 <b>' + all.done + '</b>/' + all.total + '</span>' +
+    '<span class="rchip' + (all.wrongLeft ? ' bad' : ' good') + '">남은 오답 <b>' + all.wrongLeft + '</b>문항</span>' +
+    '<span class="rchip">📌 핀 <b>' + all.marked + '</b></span>' +
+    (last ? '<span class="rchip good">최근 모의고사 <b>' + (Math.round(last.score * 10) / 10) + '점</b> · ' +
+      (last.right || 0) + '/' + (last.total || 0) + '</span>' : '') +
+    '</div>';
+
+  var tools = '<div class="rtools">' +
+    '<button type="button" class="rsort on" id="rSortBtn">정렬: 취약순</button>' +
+    (hasKids() ? '<button type="button" class="rsort" id="rLvBtn">' + (RLEVEL === 1 ? (HAS_CH ? '보기: CHAPTER' : '보기: 단원') : '보기: 세부 단원') + '</button>' : '') +
+    '<span class="rlegend">막대 = 정답률 · 행을 누르면 그 단원으로 이동</span>' +
+    '</div>';
+
+  var list = '<div class="rlist">';
+  if (!rows.length) list += '<div class="rlegend" style="padding:14px">표시할 단원이 없습니다.</div>';
+  rows.forEach(function(r, i){
+    var st = r.st;
+    var pc = st.acc;
+    var cls = pc === null ? 'none' : (pc < 50 ? 'low' : (pc < 70 ? 'mid' : ''));
+    var barW = pc === null ? 0 : Math.max(2, pc);
+    var meta = pc === null
+      ? '아직 안 푼 단원 · ' + st.total + '문항'
+      : '푼 <b>' + st.done + '</b>/' + st.total + ' · 맞음 <b>' + st.right + '</b>' +
+        (st.wrongLeft ? ' · 남은 오답 <b>' + st.wrongLeft + '</b>' : ' · 남은 오답 0') +
+        (st.marked ? ' · 📌 ' + st.marked : '');
+    list += '<button type="button" class="rrow' + (RLEVEL === 2 ? ' lv2' : '') + '" data-ri="' + i + '">' +
+      '<div class="rline">' +
+        '<span class="rname">' + esc(r.name) + '</span>' +
+        (RLEVEL === 2 || !HAS_CH ? '<span class="rpart">' + esc(r.part) + '</span>' : '') +
+        '<span class="rpct ' + cls + '">' + (pc === null ? '—' : pc + '%') + '</span>' +
+      '</div>' +
+      '<div class="rbar"><i class="' + cls + '" style="width:' + barW + '%"></i></div>' +
+      '<div class="rmeta">' + meta + '</div>' +
+    '</button>';
+  });
+  list += '</div>';
+
+  var p = $('radarPanel');
+  p.innerHTML =
+    '<div class="rhd">' +
+      '<span class="rt">📊 약점 레이더</span>' +
+      '<span class="rsub">' + esc(HAS_CH ? 'CHAPTER·세부 단원' : '단원·세부 단원') + '별 정답률</span>' +
+      '<button type="button" class="rx" id="rClose">닫기</button>' +
+    '</div>' + sum + tools + list;
+
+  var rowsNow = rows;
+  var btns = p.querySelectorAll('.rrow');
+  for (var i = 0; i < btns.length; i++){
+    btns[i].onclick = (function(r){
+      return function(){ jumpTo(r); };
+    })(rowsNow[+btns[i].dataset.ri]);
+  }
+  var sb = $('rSortBtn');
+  if (sb) sb.onclick = function(){
+    RSORT = (RSORT === 'weak' ? 'book' : 'weak');
+    renderRadar();
+  };
+  var lb = $('rLvBtn');
+  if (lb) lb.onclick = function(){
+    RLEVEL = (RLEVEL === 1 ? 2 : 1);
+    renderRadar();
+  };
+  var cb = $('rClose');
+  if (cb) cb.onclick = closeRadar;
+  /* 정렬 버튼 글자를 현재 상태로 */
+  if (sb) sb.textContent = '정렬: ' + (RSORT === 'weak' ? '취약순' : '교재순');
+  if (sb) sb.classList.toggle('on', RSORT === 'weak');
+}
+function openRadar(){
+  if (EX.on) return;
+  if (!hasKids()) RLEVEL = 1;
+  renderRadar();
+  document.body.classList.add('radaropen');
+  var p = $('radarPanel'); if (p) p.scrollTop = 0;
+}
+function closeRadar(){ document.body.classList.remove('radaropen'); }
+
+/* 행을 누르면 레이더를 닫고 그 단원으로 이동 */
+function jumpTo(r){
+  if (!r) return;
+  closeRadar();
+  state.part = r.part || '전체';
+  if (HAS_CH){
+    state.chapter = r.name;
+    state.unit = '';
+    state.sub = '전체 세부';
+  } else {
+    state.unit = r.name;
+    state.sub = '전체 세부';
+  }
+  if ('kind' in state) state.kind = '전체';
+  if ('type' in state) state.type = 'all';
+  state.view = 'all'; state.star = 0; state.idx = 0;
+  save(); buildSelectors(); rebuild();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  toast('📊 ' + (r.kid || r.name) + ' 단원으로 이동했습니다.', 1800);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ② ⏱️ 실전 모의고사
+   ═══════════════════════════════════════════════════════════════════════════ */
+var EX = {on: false, qs: [], pick: {}, i: 0, left: EXAM_SEC, endAt: 0, paused: false,
+          timer: 0, submitted: false, res: null, prevRead: false, arm: 0, armT: 0, showGrid: false};
+
+function examPool(){
+  return DATA.filter(function(q){
+    return q && q.choices && q.choices.length >= 2 && !q.noAns;
+  });
+}
+function shuffle(a){
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function pickedN(){ return Object.keys(EX.pick).length; }
+
+function startExam(){
+  if (EX.on) return;
+  EX.prevRead = !!readMode;
+  /* 회독 모드·형광펜은 깔끔하게 끄고 들어간다 */
+  if (readMode){
+    try { clearTimeout(readPosTimer); saveReadPos(); } catch (e){}
+    readMode = false; writeJSON(LSR, false);
+    document.body.classList.remove('readmode');
+    if (typeof syncReadBtn === 'function') syncReadBtn();
+  }
+  if (hlOn) hlOff(true);
+  try { closeDrawer(); } catch (e){}
+
+  var pool = shuffle(examPool().slice());
+  var n = Math.min(EXAM_N, pool.length);
+  EX.on = true; EX.qs = pool.slice(0, n); EX.pick = {}; EX.i = 0;
+  EX.paused = false; EX.submitted = false; EX.res = null; EX.left = EXAM_SEC;
+  EX.arm = 0; EX.showGrid = false;
+  document.body.classList.add('exammode');
+  document.body.classList.remove('exampaused');
+  var c = $('card'); if (c) c.classList.remove('plain');
+  exTickStart();
+  exRender();
+  window.scrollTo({top: 0, behavior: 'auto'});
+  toast('⏱️ 실전 모의고사 — ' + n + '문항 · 50분. 고른 답은 표시만 되고, 제출해야 채점됩니다.', 3200);
+}
+function exTickStart(){
+  clearInterval(EX.timer);
+  EX.endAt = Date.now() + EX.left * 1000;
+  EX.timer = setInterval(function(){
+    if (!EX.on || EX.submitted || EX.paused) return;
+    EX.left = Math.max(0, (EX.endAt - Date.now()) / 1000);
+    exClock();
+    if (EX.left <= 0) submitExam(true);
+  }, 250);
+}
+function exClock(){
+  var cl = $('exClock');
+  if (!cl) return;
+  if (EX.submitted){
+    cl.textContent = '사용 ' + fmtT(EX.res ? EX.res.used : 0);
+    cl.classList.remove('warn');
+    return;
+  }
+  cl.textContent = fmtT(EX.left);
+  cl.classList.toggle('warn', EX.left <= 300);
+}
+function exBar(){
+  exClock();
+  var ct = $('exCnt');
+  if (ct){
+    ct.textContent = EX.submitted
+      ? ('정답 ' + (EX.res ? EX.res.right : 0) + '/' + (EX.res ? EX.res.total : EX.qs.length))
+      : (pickedN() + '/' + EX.qs.length);
+  }
+  var pb = $('exPause');
+  if (pb){
+    pb.style.display = EX.submitted ? 'none' : '';
+    pb.textContent = EX.paused ? '▶ 재개' : '⏸ 일시정지';
+  }
+  var sb = $('exSubmit');
+  if (sb) sb.style.display = EX.submitted ? 'none' : '';
+  var xb = $('exExit');
+  if (xb) xb.textContent = '나가기';
+  if (typeof updateProgress === 'function') updateProgress();   /* 상단 진행 표시도 모의고사 기준 */
+}
+function exGo(d){
+  if (!EX.on || EX.submitted) return;
+  var n = EX.i + d;
+  if (n < 0 || n >= EX.qs.length) return;
+  EX.i = n; EX.showGrid = false;
+  exRender();
+  window.scrollTo({top: 0, behavior: 'auto'});
+}
+function exPick(n){
+  if (!EX.on || EX.submitted || EX.paused) return;
+  var q = EX.qs[EX.i]; if (!q) return;
+  EX.pick[q.id] = n;
+  var opts = document.querySelectorAll('#card .exopt');
+  for (var i = 0; i < opts.length; i++){
+    opts[i].classList.toggle('selected', opts[i].dataset.exopt === n);
+  }
+  exBar();
+}
+function exTogglePause(){
+  if (!EX.on || EX.submitted) return;
+  if (EX.paused){
+    EX.paused = false;
+    document.body.classList.remove('exampaused');
+    EX.endAt = Date.now() + EX.left * 1000;
+  } else {
+    EX.paused = true;
+    EX.left = Math.max(0, (EX.endAt - Date.now()) / 1000);
+    document.body.classList.add('exampaused');
+  }
+  exRender();
+}
+
+/* ── 문제 화면 ── */
+function exRender(){
+  var card = $('card');
+  if (!card || !EX.on) return;
+  if (EX.submitted){ card.innerHTML = exResultHtml(); hookResult(); exBar(); return; }
+
+  var q = EX.qs[EX.i]; if (!q) return;
+  var pick = EX.pick[q.id];
+  var intro = (q.intro || []).map(function(t){ return '<div class="intro">' + esc(t) + '</div>'; }).join('');
+  var tables = (q.tables || []).map(function(t){ return '<div class="tblwrap">' + t + '</div>'; }).join('');
+  if (q.tableRows && q.tableRows.length && typeof tblHtml === 'function') tables += tblHtml(q.tableRows);
+  var img = q.img ? '<img class="qimg" alt="' + esc(q.imgAlt || '문제 그림') + '" src="' + q.img + '">' : '';
+  var bogi = '';
+  if (q.bogi && q.bogi.length){
+    bogi = '<div class="bogi ' + (q.letters ? '' : 'law') + '">' + q.bogi.map(function(p){
+      return '<div class="bi">' + (p.mk ? '<span class="k">' + esc(p.mk) + '</span>' : '') +
+             '<span>' + esc(p.tx) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  var opts = (q.choices || []).map(function(c){
+    return '<div class="opt exopt' + (pick === c.n ? ' selected' : '') + '" data-exopt="' + c.n + '">' +
+      '<span class="num">' + c.n + '</span><span class="txt">' + esc(c.text) + '</span></div>';
+  }).join('');
+
+  var nav = '<div class="exnav">' +
+    '<button type="button" class="btn" id="exPrev"' + (EX.i === 0 ? ' disabled' : '') + '>← 이전</button>' +
+    '<button type="button" class="btn primary" id="exNext"' + (EX.i >= EX.qs.length - 1 ? ' disabled' : '') + '>다음 →</button>' +
+    '<button type="button" class="btn" id="exGridBtn">☰ 번호</button>' +
+    '<span class="exnum">' + (EX.i + 1) + ' / ' + EX.qs.length + '</span>' +
+  '</div>';
+  var grid = '<div class="exgrid' + (EX.showGrid ? ' open' : '') + '">' + EX.qs.map(function(x, i){
+    var on = EX.pick[x.id] ? ' on' : '';
+    var cur = (i === EX.i ? ' cur' : '');
+    return '<button type="button" class="cell' + on + cur + '" data-exjump="' + i + '">' + (i + 1) + '</button>';
+  }).join('') + '</div>';
+
+  var pause = EX.paused
+    ? '<div class="expause">⏸ 일시정지<br><span style="font-size:14px;font-weight:700;color:#6b7787">남은 시간 ' +
+      fmtT(EX.left) + ' 이 멈춰 있습니다.</span><button type="button" class="pbtn" id="exResume">계속하기</button></div>'
+    : '';
+
+  card.classList.add('examcard');
+  card.innerHTML =
+    '<div class="qhead">' +
+      '<div class="qno">' + (EX.i + 1) + '.</div>' +
+      '<div class="qmain">' +
+        '<div class="qmeta"><span class="b round">⏱️ 실전 모의고사</span>' +
+          '<span class="b diff d-jung">' + (q.choices || []).length + '지선다</span>' +
+          (pick ? '<span class="b streak">내 답 ' + esc(pick) + '</span>' : '') + '</div>' +
+        '<div class="stem">' + esc(q.stem) + '</div>' +
+      '</div>' +
+    '</div>' +
+    intro + bogi + tables + img +
+    '<div class="opts">' + opts + '</div>' +
+    nav + grid + pause;
+
+  var ops = card.querySelectorAll('.exopt');
+  for (var i = 0; i < ops.length; i++){
+    ops[i].onclick = function(){ exPick(this.dataset.exopt); };
+  }
+  var b1 = $('exPrev'), b2 = $('exNext'), b3 = $('exGridBtn');
+  if (b1) b1.onclick = function(){ exGo(-1); };
+  if (b2) b2.onclick = function(){ exGo(1); };
+  if (b3) b3.onclick = function(){ EX.showGrid = !EX.showGrid; exRender(); };
+  var cells = card.querySelectorAll('.exgrid .cell');
+  for (var k = 0; k < cells.length; k++){
+    cells[k].onclick = function(){
+      EX.i = +this.dataset.exjump; EX.showGrid = false; exRender();
+      window.scrollTo({top: 0, behavior: 'auto'});
+    };
+  }
+  var rs = $('exResume');
+  if (rs) rs.onclick = exTogglePause;
+  exBar();
+}
+
+/* ── 제출 → 채점 ── */
+function submitExam(auto){
+  if (!EX.on || EX.submitted) return;
+  var blankN = EX.qs.length - pickedN();
+  if (!auto){
+    var now = Date.now();
+    if (!EX.arm || now - EX.arm > 4000){
+      EX.arm = now;
+      var sb = $('exSubmit');
+      if (sb) sb.textContent = '제출 · 한 번 더' + (blankN ? ' (미답 ' + blankN + ')' : '');
+      toast('한 번 더 누르면 제출합니다.' + (blankN ? ' 아직 안 푼 ' + blankN + '문항이 있습니다.' : ''), 2600);
+      setTimeout(function(){
+        if (!EX.submitted && EX.arm && Date.now() - EX.arm >= 3900){
+          EX.arm = 0;
+          var b = $('exSubmit'); if (b) b.textContent = '제출하기';
+        }
+      }, 4100);
+      return;
+    }
+    EX.arm = 0;
+  }
+  var right = 0, miss = [], blank = [];
+  for (var i = 0; i < EX.qs.length; i++){
+    var q = EX.qs[i], p = EX.pick[q.id];
+    if (!p){ blank.push({i: i, q: q}); continue; }
+    var c = null, cs = q.choices || [];
+    for (var j = 0; j < cs.length; j++){ if (cs[j].n === p){ c = cs[j]; break; } }
+    if (c && c.ans) right++; else miss.push({i: i, q: q, pick: p});
+  }
+  var total = EX.qs.length;
+  var score = total ? Math.round(right / total * 1000) / 10 : 0;
+  var used = Math.max(0, Math.round(EXAM_SEC - EX.left));
+  EX.res = {right: right, total: total, score: score, used: used, miss: miss, blank: blank, auto: !!auto, at: Date.now()};
+  EX.submitted = true;
+  clearInterval(EX.timer);
+  try {
+    writeJSON(LS + '_examlast', {at: EX.res.at, score: score, right: right, total: total, used: used, auto: !!auto});
+  } catch (e){}
+  exRender();
+  window.scrollTo({top: 0, behavior: 'auto'});
+  if (auto) toast('⏱️ 시간이 끝났습니다. 자동으로 제출했습니다.', 2600);
+}
+
+function exResultHtml(){
+  var r = EX.res || {right: 0, total: 0, score: 0, used: 0, miss: [], blank: []};
+  var verdict = r.score >= PASS_LINE ? ['pass', '합격권 (' + PASS_LINE + '점 이상)']
+              : r.score >= PASS_SEC  ? ['fail', '불합격 (' + PASS_LINE + '점 미만)']
+              : ['fail', '과락 (' + PASS_SEC + '점 미만)'];
+  var sheet = EX.qs.map(function(q, i){
+    var p = EX.pick[q.id];
+    if (!p) return '<button type="button" class="sc n" data-exgo="' + i + '">' + (i + 1) + '<br>미답</button>';
+    var c = null, cs = q.choices || [];
+    for (var j = 0; j < cs.length; j++){ if (cs[j].n === p){ c = cs[j]; break; } }
+    var ok = !!(c && c.ans);
+    return '<button type="button" class="sc ' + (ok ? 'o' : 'x') + '" data-exgo="' + i + '">' + (i + 1) + '<br>' + (ok ? 'O' : 'X') + '</button>';
+  }).join('');
+
+  var rows = [];
+  r.miss.forEach(function(m){ rows.push({i: m.i, q: m.q, pick: m.pick}); });
+  r.blank.forEach(function(b){ rows.push({i: b.i, q: b.q, pick: ''}); });
+  rows.sort(function(a, b){ return a.i - b.i; });
+
+  var lost = rows.map(function(x){
+    var q = x.q;
+    var keyC = null, cs = q.choices || [], k;
+    for (k = 0; k < cs.length; k++){ if (cs[k].ans){ keyC = cs[k]; break; } }
+    var notes = cs.filter(function(c){ return c.note; });
+    return '<div class="exw" id="exw-' + x.i + '">' +
+      '<div class="exwh"><span class="exwn">' + (x.i + 1) + '.</span>' +
+        (x.pick ? '<span class="exwtag x">✗ 내 답 ' + esc(x.pick) + '</span>'
+                : '<span class="exwtag n">미답</span>') +
+        '<span style="font-size:12px;font-weight:800;color:#6b7787">' + esc(q.roundLabel || '') + '</span>' +
+      '</div>' +
+      '<div class="exwstem">' + esc(q.stem) + '</div>' +
+      (keyC ? '<div class="exwans">정답 ' + keyC.n + ' — ' + esc(keyC.text) + '</div>' : '') +
+      (q.core ? '<div class="exwcore">' + esc(q.core) + '</div>' : '') +
+      (keyC && keyC.note ? '<div class="exwnote">[' + keyC.n + '] ' + esc(keyC.note) + '</div>' : '') +
+      (q.key ? '<div class="exwnote" style="color:#8a6100">[핵심] ' + esc(q.key) + '</div>' : '') +
+    '</div>';
+  }).join('');
+
+  return '<div class="exres">' +
+    '<div class="exscore"><span class="big">' + r.score + '<span>점</span></span>' +
+      '<span class="verdict ' + verdict[0] + '">' + verdict[1] + '</span></div>' +
+    '<div class="exmeta">' +
+      '정답 <b>' + r.right + '</b> / ' + r.total + '문항 · 틀림 <b>' + r.miss.length + '</b> · 미답 <b>' + r.blank.length + '</b><br>' +
+      '소요 시간 <b>' + fmtT(r.used) + '</b>' + (r.auto ? ' · 시간 종료로 자동 제출' : '') +
+    '</div>' +
+    '<div class="excrit">과목 합격 기준 — 100점 환산 <b>' + PASS_SEC + '점 미만은 과락</b>, <b>' + PASS_LINE + '점 이상</b>이면 합격권입니다.' +
+      ' (문항당 ' + (r.total ? Math.round(100 / r.total * 10) / 10 : 0) + '점)</div>' +
+    '<div class="exsheet">' + sheet + '</div>' +
+    '<div class="rlegend" style="font-size:12px;color:#6b7787;font-weight:700">정오표 — 번호를 누르면 아래 해설로 이동합니다.</div>' +
+    (rows.length
+      ? '<div class="exwlist"><div class="fphead"><span class="t">틀린 문제 해설 ' + rows.length + '문항</span></div>' + lost + '</div>'
+      : '<div class="exallok">전 문항 정답입니다. 🎉</div>') +
+    '<div class="exbtns">' +
+      '<button type="button" class="btn primary" id="exAgain">새 모의고사</button>' +
+      '<button type="button" class="btn" id="exOut">나가기</button>' +
+    '</div>' +
+  '</div>';
+}
+function hookResult(){
+  var cells = document.querySelectorAll('#card .exsheet .sc');
+  for (var i = 0; i < cells.length; i++){
+    cells[i].onclick = function(){
+      var el = $('exw-' + this.dataset.exgo);
+      if (el){
+        var y = window.pageYOffset + el.getBoundingClientRect().top - (document.querySelector('.stickyhead').offsetHeight || 0) - 12;
+        window.scrollTo({top: y > 0 ? y : 0, behavior: 'smooth'});
+      } else {
+        toast('이 문항은 맞혔습니다.', 1400);
+      }
+    };
+  }
+  var a = $('exAgain'); if (a) a.onclick = function(){ exitExam(true); startExam(); };
+  var o = $('exOut');   if (o) o.onclick = function(){ exitExam(false); };
+}
+
+/* ── 나가기: 단원 학습 화면·기록 그대로 복귀 ── */
+function exitExam(quiet){
+  if (!EX.on) return;
+  clearInterval(EX.timer);
+  var wasSubmitted = EX.submitted;
+  EX.on = false; EX.submitted = false; EX.qs = []; EX.pick = {}; EX.res = null;
+  EX.paused = false; EX.arm = 0; EX.showGrid = false;
+  document.body.classList.remove('exammode');
+  document.body.classList.remove('exampaused');
+  var c = $('card'); if (c) c.classList.remove('examcard');
+  if (EX.prevRead){
+    readMode = true; writeJSON(LSR, true);
+    document.body.classList.add('readmode');
+    hlOff(true);
+    if (typeof syncReadBtn === 'function') syncReadBtn();
+  }
+  buildSelectors();
+  rebuild();
+  window.scrollTo({top: 0, behavior: 'auto'});
+  if (!quiet) toast(wasSubmitted ? '모의고사를 마쳤습니다. 단원 학습 기록은 그대로입니다.'
+                                 : '모의고사를 나갔습니다. 단원 학습 기록은 그대로입니다.', 2200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   기존 화면 그리기 함수 보호 — 모의고사 중에는 학습 화면이 덮어쓰지 않는다
+   (☁️ 동기화가 주기적으로 rebuild() 를 부르므로 필요)
+   ═══════════════════════════════════════════════════════════════════════════ */
+var _render = window.render, _renderRead = window.renderRead,
+    _rebuild = window.rebuild, _updateProgress = window.updateProgress, _go = window.go;
+if (typeof _render === 'function') window.render = function(){ if (EX.on) return; return _render.apply(this, arguments); };
+if (typeof _renderRead === 'function') window.renderRead = function(){ if (EX.on) return; return _renderRead.apply(this, arguments); };
+if (typeof _rebuild === 'function') window.rebuild = function(){ if (EX.on) return; return _rebuild.apply(this, arguments); };
+if (typeof _updateProgress === 'function') window.updateProgress = function(){
+  if (EX.on){
+    var t = $('progtxt');
+    if (t) t.textContent = '⏱️ 모의고사 ' + (EX.submitted ? '채점 완료' : (EX.i + 1) + ' / ' + EX.qs.length);
+    var f = $('progfill');
+    if (f) f.style.width = (EX.qs.length ? Math.round((EX.i + 1) / EX.qs.length * 100) : 0) + '%';
+    return;
+  }
+  return _updateProgress.apply(this, arguments);
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   버튼·이벤트 연결
+   ═══════════════════════════════════════════════════════════════════════════ */
+var br = $('btnRadar'); if (br) br.onclick = openRadar;
+var be = $('btnExam');  if (be) be.onclick = startExam;
+var bk = $('radarBack'); if (bk) bk.onclick = closeRadar;
+var exPause = $('exPause');   if (exPause) exPause.onclick = exTogglePause;
+var exSubmit = $('exSubmit'); if (exSubmit) exSubmit.onclick = function(){ submitExam(false); };
+var exExit = $('exExit');     if (exExit) exExit.onclick = function(){ exitExam(false); };
+
+/* 모의고사 중 숫자키·화살표키는 기존 채점 대신 모의고사만 조작한다 */
+document.addEventListener('keydown', function(e){
+  if (!EX.on) return;
+  var t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+  if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); return; }
+  if (e.key === 'ArrowRight'){ e.preventDefault(); e.stopPropagation(); exGo(1); return; }
+  if (e.key === 'ArrowLeft'){ e.preventDefault(); e.stopPropagation(); exGo(-1); return; }
+  if (/^[1-5]$/.test(e.key)){
+    e.preventDefault(); e.stopPropagation();
+    if (EX.submitted || EX.paused) return;
+    var q = EX.qs[EX.i]; if (!q) return;
+    var c = (q.choices || [])[+e.key - 1];
+    if (c) exPick(c.n);
+  }
+}, true);
+
+/* 새로고침·다른 탭 이동으로 모의고사 화면이 남아 있지 않게 정리 */
+window.addEventListener('beforeunload', function(){ if (EX.on) clearInterval(EX.timer); });
+
+/* 점검용 손잡이 */
+window.__radarExam = {radarRows: radarRows, openRadar: openRadar, closeRadar: closeRadar,
+  startExam: startExam, submitExam: submitExam, exitExam: exitExam, EX: EX,
+  state: function(){ return {level: RLEVEL, sort: RSORT, hasCh: HAS_CH}; }};
+})();
+
 </script>
 </body>
 </html>
