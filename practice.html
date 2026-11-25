@@ -3676,7 +3676,7 @@ if (typeof _base === 'function'){
    ═══════════════════════════════════════════════════════════════════════════ */
 var NUM_UNITS = '년|개년|개월|월|일|시간|분|초|%|퍼센트|원|㎡|m²|제곱미터|평|층|세대|호|인|명|회|개|점|배';
 var TOK = new RegExp('\\d[\\d,\\.]*\\s?(?:' + NUM_UNITS + ')|제\\s?\\d+조(?:의\\s?\\d+)?|제\\s?\\d+항|제\\s?\\d+호', 'g');
-var MASK_SEL = '.opt.correct .txt, .rans .tx, .core, .note .tx, .keybox, .termbox, .addbox-p, .amendbox';
+var MASK_SEL = '.opt.correct .txt, .rans .tx, .core, .note .tx, .keybox, .termbox, .addbox-p, .amendbox, .wpick.ans .tx, .wexp .hlz';
 
 function blankBtn(ans){
   var b = document.createElement('button');
@@ -3726,20 +3726,19 @@ function maskZones(root, stat){
     stat.n++;
   }
 }
-function applyMask(root, stat, maxCards){
+function applyMask(root, stat, maxSel, maxN){
   if (!root) return stat;
-  if (maxCards){
-    /* 회독 모드: 400문항을 한 번에 가리면 화면이 무거워지므로 앞쪽 카드만 가린다 */
-    var cards = root.querySelectorAll('.rcard'), done = 0;
-    for (var i = 0; i < cards.length && done < maxCards; i++){ maskZones(cards[i], stat); done++; }
-    stat.capped = cards.length > maxCards ? cards.length : 0;
+  if (maxSel){
+    /* 회독·오답 목록처럼 카드가 수백 장이면 앞쪽만 가린다(화면이 무거워지지 않게) */
+    var cards = root.querySelectorAll(maxSel), done = 0;
+    for (var i = 0; i < cards.length && done < maxN; i++){ maskZones(cards[i], stat); done++; }
+    stat.capped = cards.length > maxN ? cards.length : 0;
     return stat;
   }
   maskZones(root, stat);
   return stat;
 }
-/* 빈칸 탭 → 펼치기 / 다시 가리기 (capture 단계에서 처리해 선지 선택을 막는다) */
-document.addEventListener('click', function(e){
+/* 빈칸 탭 → 펼치기 / 다시 가리기 (capture 단계에서 처리해 선지 선택을 막는다) */document.addEventListener('click', function(e){
   var t = e.target;
   var b = (t && t.closest) ? t.closest('.bk') : null;
   if (!b) return;
@@ -3854,7 +3853,7 @@ function afterRender(){
   if (readMode){
     if (BLANK){
       var st = {n: 0};
-      applyMask(card, st, 120);
+      applyMask(card, st, '.rcard', 120);
       var old = card.querySelector('.modenote');
       if (old) old.parentNode.removeChild(old);
       var d = document.createElement('div');
@@ -3879,13 +3878,36 @@ function afterRender(){
 function safeAfter(){ try { afterRender(); } catch(e){} }
 
 /* 기존 그리기 함수는 그대로 두고 뒤처리만 덧붙인다 (레이더·모의고사 래퍼와도 충돌 없음) */
-var _render = window.render, _renderRead = window.renderRead, _renderGrid = window.renderGrid;
+var _render = window.render, _renderRead = window.renderRead, _renderGrid = window.renderGrid,
+    _renderWrong = window.renderWrongList;
 if (typeof _render === 'function') window.render = function(){
   var r = _render.apply(this, arguments); safeAfter(); return r; };
 if (typeof _renderRead === 'function') window.renderRead = function(){
   var r = _renderRead.apply(this, arguments); safeAfter(); return r; };
 if (typeof _renderGrid === 'function') window.renderGrid = function(){
   var r = _renderGrid.apply(this, arguments); try { annotateGrid(); } catch(e){} return r; };
+if (typeof _renderWrong === 'function') window.renderWrongList = function(){
+  var r = _renderWrong.apply(this, arguments);
+  try {
+    if (BLANK && !exOn()){
+      var card = $('card'), st = {n: 0};
+      applyMask(card, st, '.wcard', 80);
+      var d = document.createElement('div');
+      d.className = 'modenote';
+      d.innerHTML = '🧩 빈칸 암기 — 가려진 <b class="mnum">[ ___ ] ' + st.n + '개</b>를 누르면 정답이 펼쳐집니다.' +
+        (st.capped ? ' 오답이 많아 앞 80문항까지만 가립니다.' : '');
+      card.insertBefore(d, card.firstChild);
+    }
+    annotateGrid(); syncBtns();
+  } catch(e){}
+  return r; };
+
+/* 메모를 적을 때 숫자·화살표 키가 문제 채점·이동으로 새지 않게 한다(페이지 단축키 차단) */
+document.addEventListener('keydown', function(e){
+  var t = e.target;
+  if (!t) return;
+  if (t.tagName === 'TEXTAREA' || t.isContentEditable) e.stopPropagation();
+}, true);
 
 /* 빈칸 암기 중에는 형광펜을 켜지 못하게 한다(가린 글자 위에 칠하면 자리 계산이 어긋난다) */
 document.addEventListener('click', function(e){
@@ -4104,6 +4126,9 @@ function openPdf(){
   if (b1) b1.onclick = function(){ try { window.print(); } catch(e){} };
   if (b2) b2.onclick = closePdf;
   window.scrollTo(0, 0);
+  var n = 0;
+  try { n = activeWrongs().length; } catch(e){ n = 0; }
+  if (!n){ say('📄 아직 남은 오답이 없습니다 — 틀린 문항이 생기면 여기에 모입니다.', 2800); return; }
   setTimeout(function(){ try { window.print(); } catch(e){} }, 400);
 }
 function closePdf(){
