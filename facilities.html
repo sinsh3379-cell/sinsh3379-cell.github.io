@@ -751,8 +751,6 @@ body.pdfopen .pdfview{display:block;position:fixed;inset:0;z-index:70;background
     <select id="selView" title="보기 범위" style="display:none"></select>
   </div>
   <div class="selin moderow"><div class="modetabs" id="modeTabs"></div><button type="button" class="readtab" id="btnRead" aria-pressed="false" title="이 단원의 모든 문제를 정답·해설까지 한 번에 펼쳐 봅니다">📖 회독 모드</button><button type="button" class="readtab radartab" id="btnRadar" title="단원별 정답률·남은 오답을 한눈에 보고 취약 단원으로 바로 이동합니다"><span class="ric">📊</span><span class="rlbl">약점 레이더</span></button><button type="button" class="readtab examtab" id="btnExam" title="객관식 40문항 · 50분 실전 모의고사 (단원 학습 기록은 건드리지 않습니다)"><span class="ric">⏱️</span><span class="rlbl">모의고사</span></button></div>
-</div>
-
 
 <div class="selin newrow" id="newRow">
   <button type="button" class="nfb y3" id="btnY3" aria-pressed="false" title="27·28·29회에 나온 문항(선지 출처 포함)만 모아 봅니다"><span class="nic">🔥</span><span class="nlbl">최근 3개년</span></button>
@@ -760,6 +758,8 @@ body.pdfopen .pdfview{display:block;position:fixed;inset:0;z-index:70;background
   <button type="button" class="nfb ox" id="btnOX" title="5지선다의 각 지문을 하나씩 O/X로 판별하는 스피드 퀴즈 (연습 — 기록 불변)"><span class="nic">⚡</span><span class="nlbl">O/X 퀴즈</span></button>
   <button type="button" class="nfb pdf" id="btnPDF" title="지금 남아 있는 오답과 내 메모를 A4로 인쇄·PDF 저장"><span class="nic">📄</span><span class="nlbl">오답 PDF</span></button>
 </div>
+</div>
+
 <div class="examrow" id="examBar">
   <div class="exin">
     <span class="exclock" id="exClock">50:00</span>
