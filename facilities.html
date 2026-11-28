@@ -612,6 +612,65 @@ body.readmode .nfb.hlrd{display:inline-flex}
   body.readmode .nfb{font-size:11px;padding:5px 3px}
 }
 
+/* ── 🖼️ 그림 암기장 (01~08 그림·표 카드 모달) ─────────────────────── */
+.nfb.pic{border-color:#b7cfe8;background:#f3f9ff;color:#12496f}
+.nfb.pic:active{background:#e3effb}
+.picback{position:fixed;inset:0;background:rgba(10,20,35,.5);opacity:0;pointer-events:none;
+  transition:opacity .16s;z-index:64}
+body.picopen .picback{opacity:1;pointer-events:auto}
+.picpanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.97);
+  width:min(860px,calc(100% - 16px));height:min(94vh,1040px);display:flex;flex-direction:column;
+  background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(10,20,35,.34);z-index:65;
+  opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
+body.picopen .picpanel{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.pichd{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:#123a63;color:#fff;flex:0 0 auto}
+.pichd .picttl{font-size:15px;font-weight:900;line-height:1.3}
+.pichd .picsub{font-size:11.5px;font-weight:700;opacity:.92;margin-top:2px;line-height:1.45;word-break:keep-all}
+.pichd .picx{margin-left:auto;flex:0 0 auto;appearance:none;border:1px solid rgba(255,255,255,.55);background:transparent;
+  color:#fff;border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit}
+.pictabs{display:flex;gap:5px;overflow-x:auto;padding:8px 10px;background:#f5f9fd;border-bottom:1px solid #e3ebf4;
+  flex:0 0 auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pictabs::-webkit-scrollbar{display:none}
+.pictab{flex:0 0 auto;appearance:none;border:1px solid #cbd9e8;background:#fff;color:#284c73;border-radius:9px;
+  padding:6px 10px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap;line-height:1.25}
+.pictab.on{background:#123a63;border-color:#123a63;color:#fff;box-shadow:0 0 0 2px rgba(18,58,99,.14)}
+.picbody{flex:1 1 auto;overflow:auto;background:#e9eef5;padding:8px;display:flex;
+  justify-content:center;align-items:flex-start;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom;
+  overscroll-behavior:contain}
+.picbody img{display:block;width:100%;max-width:840px;height:auto;border-radius:8px;
+  box-shadow:0 2px 12px rgba(10,20,35,.14);background:#fff}
+.picbody.z15,.picbody.z20,.picbody.z25{justify-content:flex-start}
+.picbody.z15 img{width:150%;max-width:none}
+.picbody.z20 img{width:200%;max-width:none}
+.picbody.z25 img{width:250%;max-width:none}
+.picbody.ztoc{display:block;background:#f2f6fb;padding:10px}
+.pictoc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pictocc{appearance:none;border:1px solid #d9e3ef;background:#fff;border-radius:12px;padding:10px 11px;font-family:inherit;
+  text-align:left;cursor:pointer;display:flex;gap:8px;align-items:flex-start}
+.pictocc:active{background:#f4f8fd}
+.pictocc .tno{font-size:17px;font-weight:900;color:#9fb4cc;line-height:1;font-variant-numeric:tabular-nums;flex:0 0 auto}
+.pictocc .ttx{display:block;font-size:12.5px;font-weight:800;color:#1b2b40;line-height:1.4}
+.pictocc .tsb{display:block;font-size:10.5px;font-weight:700;color:#6b7c92;margin-top:2px;line-height:1.35}
+.picfoot{display:flex;align-items:center;gap:7px;padding:9px 11px;border-top:1px solid #eef1f6;flex:0 0 auto;background:#fff}
+.picnav{appearance:none;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:10px;padding:8px 12px;
+  font-size:12.5px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap}
+.picnav:active{background:#eef2f8}
+.picnav:disabled{opacity:.38;cursor:default}
+.piczoom{margin-left:auto;display:flex;gap:4px;align-items:center}
+.picz{appearance:none;border:1px solid #cfd6e2;background:#fff;color:#22314c;border-radius:9px;padding:7px 10px;
+  font-size:12px;font-weight:800;font-family:inherit;cursor:pointer}
+.picz:active{background:#eef2f8}
+.piczl{font-size:11px;font-weight:800;color:#5b6b80;font-variant-numeric:tabular-nums;min-width:36px;text-align:center}
+.picnote{font-size:11px;font-weight:700;color:#6b7c92;line-height:1.45}
+@media (max-width:430px){
+  .picpanel{width:calc(100% - 10px);height:96vh;border-radius:14px}
+  .pichd{padding:10px 11px}
+  .pichd .picttl{font-size:14px}
+  .pictoc{grid-template-columns:1fr}
+  .picnav{padding:8px 10px;font-size:12px}
+  .picz{padding:7px 9px}
+}
+
 /* ── 🧩 빈칸 ─────────────────────────────────────────────────────── */
 .modenote{margin:0 0 12px;border:1px dashed #c9bce8;background:#f8f5ff;color:#4b2c8a;border-radius:10px;
   padding:8px 11px;font-size:12.5px;font-weight:800;line-height:1.5}
@@ -761,6 +820,7 @@ body.pdfopen .pdfview{display:block;position:fixed;inset:0;z-index:70;background
   <button type="button" class="nfb blank" id="btnBlank" aria-pressed="false" title="정답 지문·해설의 숫자와 조문을 [ ___ ]로 가립니다 — 눌러서 확인"><span class="nic">🧩</span><span class="nlbl">빈칸 암기</span></button>
   <button type="button" class="nfb ox" id="btnOX" title="5지선다의 각 지문을 하나씩 O/X로 판별하는 스피드 퀴즈 (연습 — 기록 불변)"><span class="nic">⚡</span><span class="nlbl">O/X 퀴즈</span></button>
   <button type="button" class="nfb pdf" id="btnPDF" title="지금 남아 있는 오답과 내 메모를 A4로 인쇄·PDF 저장"><span class="nic">📄</span><span class="nlbl">오답 PDF</span></button>
+  <button type="button" class="nfb pic" id="btnPic" title="지금 보는 단원에 맞는 그림·표 암기장(01~08)을 엽니다 — 위/아래 칸으로 다른 장도 넘겨 봅니다"><span class="nic">🖼️</span><span class="nlbl">그림 암기장</span><span class="ns">그림</span></button>
   <button type="button" class="nfb hlrd" id="btnReadHL" aria-pressed="false" title="회독 모드에서 형광펜 모드를 켜고 끕니다 — 글자를 드래그해 선택하면 칠해지고, 칠한 곳을 누르면 지워집니다"><span class="nic">🖍️</span><span class="nlbl">형광펜</span><span class="ns">형광</span></button>
 </div>
 </div>
@@ -3646,6 +3706,8 @@ window.__radarExam = {radarRows: radarRows, openRadar: openRadar, closeRadar: cl
 <div class="oxback" id="oxBack"></div>
 <div class="oxpanel" id="oxPanel"></div>
 <div class="pdfview" id="pdfview"></div>
+<div class="picback" id="picBack"></div>
+<div class="picpanel" id="picPanel"></div>
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
    🔥 최근 3개년 · 🧩 빈칸 암기 · ⚡ 지문 O/X · 📝 1줄 메모 · 📄 오답 PDF  (2026-11-25)
@@ -4260,6 +4322,185 @@ window.__cbtFull = {
 };
 })();
 
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   🖼️ 그림 암기장 01~08  (2026-11-28)
+   ─ 지금 고른 PART/단원에 맞는 그림·표 카드를 모달로 바로 연다.
+   ─ '전체'면 01~08 목차를 보여 주고, 특정 단원이면 그 카드가 바로 열린다.
+   ─ 카드 화면에서는 ◀ ▶ 로 다른 장을 넘겨 본다. 확대(100/150/200/250%) · 핀치 확대 · 스크롤.
+   ─ 기존 풀이·채점·오답·회독·형광펜·모의고사·레이더·동기화 기록은 읽지도 쓰지도 않는다(저장 키 없음).
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+if (window.__cbtPic) return;
+
+/* 그림 카드 8장 — 파일은 img/fac-01.png ~ fac-08.png */
+var CARDS = [
+  {n:'01', t:'철근콘크리트구조',         s:'혼화제·혼화재 · 공시체·강도보정 · 크리프/건조수축'},
+  {n:'02', t:'강구조 · 조적구조',         s:'고력볼트·용접 결함 · 벽돌 쌓기·줄눈·내력벽'},
+  {n:'03', t:'급수·급탕·난방',           s:'기초물리 · 수두압·관경·트랩·배수구배·방열량'},
+  {n:'04', t:'구조총론 · 토공사·기초',    s:'장기/단기하중 · 내화 · N값 · 흙막이 3형상 · 기초 형식'},
+  {n:'05', t:'지붕·방수 · 창호·유리',     s:'지붕물매 · 아스팔트/시멘트 방수 · 결로 · 창호 성능·유리 3종'},
+  {n:'06', t:'미장·타일·도장·적산',       s:'바름 순서 · 타일 붙임·백화 · 도장 결함 · 정미량·할증'},
+  {n:'07', t:'배수·통기·위생기구 · 가스', s:'트랩 4종 · 세정방식·사이펀 · BOD·COD · LNG/LPG'},
+  {n:'08', t:'소방 · 전기·조명·환기',     s:'소방 5분류 · 스프링클러 · 유도등 · 조도·환기량·홈넷'}
+];
+/* 이 CBT의 실제 단원명 → 카드 번호 */
+var UNIT_CARD = {
+  '구조총론':'04', '토공사 및 기초구조':'04',
+  '철근콘크리트구조':'01',
+  '강구조':'02', '조적구조':'02',
+  '방수 및 방습':'05', '지붕 및 홈통공사':'05', '창호 및 유리공사':'05',
+  '미장 및 타일공사':'06', '도장·수장 및 기타 공사':'06', '적산 및 견적':'06',
+  '설비총론':'03', '급수설비':'03', '급탕설비':'03', '난방 및 냉동설비':'03',
+  '배수통기 및 위생기구 설비':'07', '오수정화설비':'07', '가스설비':'07',
+  '소방설비':'08', '공기조화 및 환기설비':'08', '전기 및 수송설비':'08',
+  '건축물에너지절약 설계기준 및 지능형 홈네트워크':'08'
+};
+/* PART만 골랐을 때(전체 단원) 여는 카드 — 그 PART 첫 단원의 카드 */
+var PART_CARD = {'건축구조':'04','건축설계':'03','건축설비':'03'};
+
+var ZS = ['1','15','20','25'];
+var ZL = {'1':'100%','15':'150%','20':'200%','25':'250%'};
+var P = {open:false, idx:-1, z:'1'};      /* idx -1 = 목차 */
+
+function $(id){ return document.getElementById(id); }
+function panel(){ return $('picPanel'); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+  return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function idxOf(n){ for (var i=0;i<CARDS.length;i++) if (CARDS[i].n === n) return i; return -1; }
+function fileOf(i){ return 'img/fac-' + CARDS[i].n + '.png'; }
+function curState(){ try { if (typeof state !== 'undefined' && state) return state; } catch(e){} return null; }
+
+/* 지금 조건에 맞는 카드 — 없으면 -1(목차) */
+function cardFor(){
+  var st = curState(); if (!st) return -1;
+  var u = st.unit, p = st.part;
+  if (u && u !== '전체 단원' && UNIT_CARD[u] != null) return idxOf(UNIT_CARD[u]);
+  if (p && p !== '전체' && PART_CARD[p] != null) return idxOf(PART_CARD[p]);
+  return -1;
+}
+/* 조건을 글로 — 어디서 열었는지 헷갈리지 않게 */
+function condLabel(){
+  var st = curState(); if (!st) return '';
+  if (!st.part || st.part === '전체') return '지금 조건: 전체 PART';
+  if (!st.unit || st.unit === '전체 단원') return '지금 조건: ' + st.part + ' 전체 단원';
+  return '지금 조건: ' + st.part + ' · ' + st.unit;
+}
+
+function render(){
+  var p = panel(); if (!p) return;
+  var inToc = P.idx < 0;
+  var c = inToc ? null : CARDS[P.idx];
+  var head = inToc
+    ? '<div><div class="picttl">🖼️ 그림 암기장 01~08</div>' +
+      '<div class="picsub">' + esc(condLabel()) + ' — 단원을 고르면 그 단원 그림·표 카드가 바로 열립니다</div></div>'
+    : '<div><div class="picttl">' + c.n + ' · ' + esc(c.t) + '</div>' +
+      '<div class="picsub">' + esc(c.s) + '</div></div>';
+
+  var tabs = '<button type="button" class="pictab' + (inToc ? ' on' : '') + '" data-i="-1">☰ 목차</button>' +
+    CARDS.map(function(cc,i){
+      return '<button type="button" class="pictab' + (i === P.idx ? ' on' : '') + '" data-i="' + i + '">' + cc.n + '</button>';
+    }).join('');
+
+  var body;
+  if (inToc){
+    body = '<div class="picbody ztoc"><div class="pictoc">' +
+      CARDS.map(function(cc,i){
+        return '<button type="button" class="pictocc" data-i="' + i + '">' +
+          '<span class="tno">' + cc.n + '</span>' +
+          '<span><span class="ttx">' + esc(cc.t) + '</span><span class="tsb">' + esc(cc.s) + '</span></span></button>';
+      }).join('') + '</div></div>';
+  } else {
+    body = '<div class="picbody z' + P.z + '"><img id="picImg" src="' + fileOf(P.idx) + '" alt="' +
+      esc(c.n + ' ' + c.t + ' 그림 암기장') + '"></div>';
+  }
+
+  var foot;
+  if (inToc){
+    foot = '<div class="picfoot"><span class="picnote">카드를 고르면 바로 열립니다 · 손가락으로 벌려도(핀치) 볼 수 있습니다</span></div>';
+  } else {
+    foot = '<div class="picfoot">' +
+      '<button type="button" class="picnav" data-nav="-1"' + (P.idx <= 0 ? ' disabled' : '') + '>◀ ' +
+        (P.idx > 0 ? CARDS[P.idx-1].n : '') + '</button>' +
+      '<button type="button" class="picnav" data-nav="1"' + (P.idx >= CARDS.length-1 ? ' disabled' : '') + '>' +
+        (P.idx < CARDS.length-1 ? CARDS[P.idx+1].n : '') + ' ▶</button>' +
+      '<div class="piczoom">' +
+        '<button type="button" class="picz" data-z="-" title="작게">−</button>' +
+        '<span class="piczl">' + ZL[P.z] + '</span>' +
+        '<button type="button" class="picz" data-z="+" title="크게 (핀치 확대도 됩니다)">＋</button>' +
+        '<button type="button" class="picz" data-z="1" title="화면 폭에 맞추기">맞춤</button>' +
+      '</div></div>';
+  }
+
+  p.innerHTML = '<div class="pichd">' + head +
+      '<button type="button" class="picx" id="picClose">닫기</button></div>' +
+    '<div class="pictabs">' + tabs + '</div>' + body + foot;
+}
+
+function setCard(i){
+  if (i < 0) P.idx = -1;
+  else P.idx = Math.max(0, Math.min(CARDS.length-1, i));
+  render();
+  var b = panel() && panel().querySelector('.picbody');
+  if (b) b.scrollTop = 0;
+  var tab = panel() && panel().querySelector('.pictab.on');
+  if (tab && tab.scrollIntoView) { try { tab.scrollIntoView({block:'nearest', inline:'center'}); } catch(e){} }
+}
+function step(d){
+  if (P.idx < 0) return;
+  setCard(P.idx + d);
+}
+function zoomTo(cmd){
+  var i = ZS.indexOf(P.z);
+  if (cmd === '+') i = Math.min(ZS.length-1, i+1);
+  else if (cmd === '-') i = Math.max(0, i-1);
+  else i = 0;
+  P.z = ZS[i];
+  var b = panel() && panel().querySelector('.picbody');
+  var l = panel() && panel().querySelector('.piczl');
+  if (b && !b.classList.contains('ztoc')) b.className = 'picbody z' + P.z;
+  if (l) l.textContent = ZL[P.z];
+}
+function openPic(){
+  P.idx = cardFor(); P.z = '1'; P.open = true;
+  document.body.classList.add('picopen');
+  render();
+}
+function closePic(){
+  P.open = false;
+  document.body.classList.remove('picopen');
+}
+
+/* 한 번만 거는 것들 */
+(function bind(){
+  var bb = $('btnPic'); if (bb) bb.onclick = openPic;
+  var bk = $('picBack'); if (bk) bk.onclick = closePic;
+  var pn = panel();
+  if (pn) pn.onclick = function(e){
+    var t = e.target && e.target.closest ? e.target.closest('#picClose,[data-i],[data-nav],[data-z]') : null;
+    if (!t || !pn.contains(t)) return;
+    if (t.id === 'picClose') { closePic(); return; }
+    if (t.hasAttribute('data-i')) { setCard(parseInt(t.getAttribute('data-i'), 10)); return; }
+    if (t.hasAttribute('data-nav')) { step(parseInt(t.getAttribute('data-nav'), 10)); return; }
+    if (t.hasAttribute('data-z')) { zoomTo(t.getAttribute('data-z')); return; }
+  };
+  document.addEventListener('keydown', function(e){
+    if (!P.open) return;
+    if (e.key === 'Escape') { closePic(); }
+    else if (e.key === 'ArrowLeft') { step(-1); }
+    else if (e.key === 'ArrowRight') { step(1); }
+  });
+})();
+
+/* 점검용 손잡이 */
+window.__cbtPic = {
+  open: openPic, close: closePic, setCard: setCard, step: step, zoom: zoomTo,
+  cards: CARDS, unitCard: UNIT_CARD, partCard: PART_CARD,
+  state: function(){ return {open: P.open, idx: P.idx, z: P.z, cardFor: cardFor(), cond: condLabel()}; }
+};
+})();
 </script>
 </body>
 </html>
